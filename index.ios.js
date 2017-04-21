@@ -11,6 +11,7 @@ import {
   Text,
   View
 } from 'react-native';
+import MainApp from './components/MainApp';
 
 export default class OrderEntry extends Component {
   render() {
@@ -50,4 +51,4 @@ const styles = StyleSheet.create({
   },
 });
 
-AppRegistry.registerComponent('OrderEntry', () => OrderEntry);
+AppRegistry.registerComponent('OrderEntry', () => MainApp);
