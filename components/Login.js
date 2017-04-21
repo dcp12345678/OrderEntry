@@ -88,12 +88,18 @@ class Login extends Component {
         //hashHistory.push('/main');
       } else {
         debugger;
-        Alert.alert('could not login', `${obj.result || '--- could not login'}`);
+        this.setState({ showSpinner: false });
+        setTimeout(() => {
+          Alert.alert('login failed!', `${obj.result || '--- could not login'}`);
+        }, 100)
         //hashHistory.push('/login');
       }
     }).catch((err) => {
       debugger;
-      Alert.alert('could not login', `${JSON.stringify(err) || '-- could not login'}`);
+      this.setState({ showSpinner: false });
+      setTimeout(() => {
+        Alert.alert('login failed!', `${JSON.stringify(err) || '-- could not login'}`);
+      }, 100)
     });
   }
 
@@ -106,10 +112,12 @@ class Login extends Component {
         </Text>
         <TextInput
           style={styles.item}
+          autoCapitalize='none'
           onChangeText={(loginId) => this.setState({ loginId })}
           placeholder="Login Id" />
         <TextInput
           style={styles.item}
+          autoCapitalize='none'
           secureTextEntry={true}
           onChangeText={(password) => this.setState({ password })}
           placeholder="Password" />
