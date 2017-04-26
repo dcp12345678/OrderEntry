@@ -7,6 +7,7 @@ import MainForm from './MainForm';
 import OrderDetails from './OrderDetails';
 import EditOrder from './EditOrder';
 import EditOrderLineItem from './EditOrderLineItem';
+import PickerListView from './PickerListView';
 
 class MainApp extends Component {
 
@@ -40,6 +41,10 @@ class MainApp extends Component {
       case 'EditOrderLineItem':
         return (
           <EditOrderLineItem navigator={navigator} {...route.passProps} />
+        );
+      case 'PickerListView':
+        return (
+          <PickerListView navigator={navigator} {...route.passProps} />
         );
     }
   }

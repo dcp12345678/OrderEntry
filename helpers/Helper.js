@@ -20,22 +20,6 @@ class Helper {
 
     return [year, month, day].join('-');
   }
-
-  static buildItemListForPicker(optionList, selectedOptionId) {
-    debugger;
-    const optId = parseInt(selectedOptionId, 10);
-    let options = [];
-    options.push(<Picker.Item key={-1} label="--Please Select--" value="-1" />);
-
-    const optionsToAdd = _.map(optionList, (option) => {
-      let o;
-      o = (<Picker.item key={option.id} value={option.id} label={option.name} />);
-      return o;
-    });
-    options.push(...optionsToAdd);
-
-    return options;
-  }
 }
 
 export default Helper;

@@ -10,7 +10,10 @@ import {
   Picker,
   Alert,
   Dimensions,
+  TouchableOpacity,
+  TextInput,
 } from 'react-native';
+import PickerButton from './PickerButton';
 import OrdersApi from '../api/OrdersApi';
 import LookupApi from '../api/LookupApi';
 import _ from 'lodash';
@@ -76,6 +79,7 @@ class EditOrderLineItem extends Component {
       self.setState({ colors, productTypes });
 
       let lineItem = {};
+      debugger;
       if (!self.state.isNew) {
         // editing an existing line item
         // const x = yield ordersApi.getOrder(self.props.orderId);
@@ -116,10 +120,27 @@ class EditOrderLineItem extends Component {
   cancel = () => {
   }
 
+  pickColor = (color) => {
+    Alert.alert(`pickColor ${JSON.stringify(color)}`);
+    let lineItem = this.state.lineItem;
+    lineItem.colorId = color.id;
+    this.setState({ lineItem });
+  }
+
+  pickProductType = (productType) => {
+    Alert.alert(`pickProductType ${JSON.stringify(productType)}`);
+    let lineItem = this.state.lineItem;
+    lineItem.productTypeId = productType.id;
+    this.setState({ lineItem });
+  }
+
   render() {
     if (!this.state.isLoaded) {
       return (<View><Text>loading...</Text></View>);
     }
+
+    //Alert.alert(`lineItem = ${JSON.stringify(this.state.lineItem)}`);
+
     let header = this.props.orderLineItemId === -1 ? "New Order Item" :
       ("Edit Order Item " + this.props.orderLineItemId);
 
@@ -149,42 +170,20 @@ class EditOrderLineItem extends Component {
         </View>
 
         <View>
-          <Text style={{ marginLeft: 10, marginTop: 10, fontSize: 15, fontWeight: 'bold', color: 'purple', }}>Select the product type:</Text>
-          <Picker
-            selectedValue={this.state.lineItem.productTypeId}
-            placeholder="--Please Select--"
-            onValueChange={(productTypeId) => {
-              let lineItem = this.state.lineItem
-              lineItem.productTypeId = productTypeId;
-              this.setState({ lineItem });
-            }}
-          >
-            {Helper.buildItemListForPicker(this.state.productTypes, this.state.lineItem.productTypeId)}
-          </Picker>
+          <Text style={{ marginLeft: 10, marginTop: 10, fontSize: 18, fontWeight: 'bold', color: 'purple', }}>Product Type</Text>
+          <PickerButton
+            data={this.state.productTypes}
+            selectedItemId={this.state.lineItem.productTypeId}
+            navigator={this.props.navigator}
+            onPickedItem={this.pickProductType} />
         </View>
         <View>
-          <Text style={{ marginLeft: 10, marginTop: 10, fontSize: 15, fontWeight: 'bold', color: 'purple', }}>Select the product name:</Text>
-          <Picker
-            selectedValue={this.state.lineItem.productId}
-            onValueChange={(productId) => {
-              let lineItem = this.state.lineItem
-              lineItem.productId = productId;
-              this.setState({ lineItem });
-            }}
-          >
-            <Picker.Item label="Java" value="java" />
-            <Picker.Item label="JavaScript" value="js" />
-          </Picker>
-        </View>
-        <View>
-          <Text style={{ marginLeft: 10, marginTop: 10, fontSize: 15, fontWeight: 'bold', color: 'purple', }}>Select the product color:</Text>
-          <Picker
-            selectedValue={this.state.language}
-            onValueChange={(lang) => this.setState({ language: lang })}
-          >
-            <Picker.Item label="Java" value="java" />
-            <Picker.Item label="JavaScript" value="js" />
-          </Picker>
+          <Text style={{ marginLeft: 10, marginTop: 10, fontSize: 18, fontWeight: 'bold', color: 'purple', }}>Product Color</Text>
+          <PickerButton
+            data={this.state.colors}
+            selectedItemId={this.state.lineItem.colorId}
+            navigator={this.props.navigator}
+            onPickedItem={this.pickColor} />
         </View>
 
       </View>

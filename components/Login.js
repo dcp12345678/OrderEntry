@@ -28,7 +28,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'lightgoldenrodyellow',
     borderWidth: 1,
     borderColor: 'goldenrod',
-    //height: 40,
     alignItems: 'center',
     alignSelf: 'stretch',
     margin: 30,
@@ -55,6 +54,10 @@ const styles = StyleSheet.create({
   purple: {
     color: '#841584'
   },
+  loginButton: {
+    marginTop: 10,
+    alignSelf: 'stretch',
+  }
 });
 
 
@@ -110,11 +113,13 @@ class Login extends Component {
           secureTextEntry={true}
           onChangeText={(password) => this.setState({ password })}
           placeholder="Password" />
-        <Button
-          onPress={this.loginOnPress}
-          title="              Login              "
-          color='#841584'
-        />
+        <View style={styles.loginButton}>
+          <Button
+            onPress={this.loginOnPress}
+            title="Login"
+            color='#841584'
+          />
+        </View>
       </View>
     );
 
