@@ -49,16 +49,16 @@ class PickerListView extends Component {
 
   render() {
     return (
-      <View style={{ flex: 1, }}>
+      <View style={{ flex: 1,}}>
         <View style={{
           flexDirection: 'row', justifyContent: 'space-around', alignSelf: 'stretch', backgroundColor: 'lightgoldenrodyellow', borderWidth: 1,
-          borderColor: 'purple'
+          borderColor: 'purple',
         }}>
           <Text
             style={{
-              fontSize: 25,
+              fontSize: 17,
               color: 'purple',
-              marginTop: 5,
+              marginTop: 25,
               marginBottom: 5
             }}
           >Choose an item
@@ -68,11 +68,11 @@ class PickerListView extends Component {
               {
                 backgroundColor: 'purple',
                 borderRadius: 12,
-                marginTop: 5,
+                marginTop: 25,
                 marginBottom: 5
               }
             }>
-              <Text style={{ fontSize: 18, color: 'white', margin: 5, }}>Cancel</Text>
+              <Text style={{ fontSize: 17, color: 'white', margin: 5, }}>Cancel</Text>
             </View>
           </TouchableOpacity>
 
