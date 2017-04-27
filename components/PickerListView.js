@@ -32,6 +32,10 @@ class PickerListView extends Component {
     this.props.navigator.pop();
   }
 
+  cancel = () => {
+    this.props.navigator.pop();
+  }
+
   renderRow = (item) => {
     debugger;
     return (
@@ -45,9 +49,33 @@ class PickerListView extends Component {
 
   render() {
     return (
-      <View style={{ flex: 1 }}>
-        <View style={{ alignItems: 'center', alignSelf: 'stretch', backgroundColor: 'lightgoldenrodyellow' }}>
-          <Text style={{ fontSize: 25, color: 'purple' }}>Choose an item</Text>
+      <View style={{ flex: 1, }}>
+        <View style={{
+          flexDirection: 'row', justifyContent: 'space-around', alignSelf: 'stretch', backgroundColor: 'lightgoldenrodyellow', borderWidth: 1,
+          borderColor: 'purple'
+        }}>
+          <Text
+            style={{
+              fontSize: 25,
+              color: 'purple',
+              marginTop: 5,
+              marginBottom: 5
+            }}
+          >Choose an item
+          </Text>
+          <TouchableOpacity onPress={this.cancel}>
+            <View style={
+              {
+                backgroundColor: 'purple',
+                borderRadius: 12,
+                marginTop: 5,
+                marginBottom: 5
+              }
+            }>
+              <Text style={{ fontSize: 18, color: 'white', margin: 5, }}>Cancel</Text>
+            </View>
+          </TouchableOpacity>
+
         </View>
         <ListView
           dataSource={this.state.dataSource}

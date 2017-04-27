@@ -76,7 +76,7 @@ class EditOrderLineItem extends Component {
       const colors = JSON.parse(res.text);
       res = yield lookupApi.getProductTypes();
       const productTypes = JSON.parse(res.text);
-      self.setState({ colors, productTypes });
+      self.setState({ colors, productTypes, products: [] });
 
       let lineItem = {};
       debugger;
@@ -121,16 +121,33 @@ class EditOrderLineItem extends Component {
   }
 
   pickColor = (color) => {
-    Alert.alert(`pickColor ${JSON.stringify(color)}`);
+    //Alert.alert(`pickColor ${JSON.stringify(color)}`);
     let lineItem = this.state.lineItem;
     lineItem.colorId = color.id;
     this.setState({ lineItem });
   }
 
   pickProductType = (productType) => {
-    Alert.alert(`pickProductType ${JSON.stringify(productType)}`);
+    //Alert.alert(`pickProductType ${JSON.stringify(productType)}`);
+
+    const self = this;
+    co(function* handleChange() {
+      const res = yield lookupApi.getProductsForProductType(productType.id);
+      const products = JSON.parse(res.text);
+      //Alert.alert(`products = ${JSON.stringify(products)}`);
+      let lineItem = self.state.lineItem;
+      lineItem.productTypeId = productType.id;
+      lineItem.products = products;
+      lineItem.productId = -1; // deselect any previously selected product
+      lineItem.colorId = -1; // deselect any previously selected color
+      self.setState({ lineItem, products });
+    });
+  }
+
+  pickProduct = (product) => {
+    //Alert.alert(`pickProduct ${JSON.stringify(product)}`);
     let lineItem = this.state.lineItem;
-    lineItem.productTypeId = productType.id;
+    lineItem.productId = product.id;
     this.setState({ lineItem });
   }
 
@@ -170,22 +187,36 @@ class EditOrderLineItem extends Component {
         </View>
 
         <View>
-          <Text style={{ marginLeft: 10, marginTop: 10, fontSize: 18, fontWeight: 'bold', color: 'purple', }}>Product Type</Text>
+          <Text style={{ marginLeft: 10, marginTop: 10, fontSize: 18, fontWeight: 'bold', color: 'black', }}>Product Type</Text>
           <PickerButton
             data={this.state.productTypes}
             selectedItemId={this.state.lineItem.productTypeId}
             navigator={this.props.navigator}
             onPickedItem={this.pickProductType} />
         </View>
-        <View>
-          <Text style={{ marginLeft: 10, marginTop: 10, fontSize: 18, fontWeight: 'bold', color: 'purple', }}>Product Color</Text>
-          <PickerButton
-            data={this.state.colors}
-            selectedItemId={this.state.lineItem.colorId}
-            navigator={this.props.navigator}
-            onPickedItem={this.pickColor} />
-        </View>
-
+        {/* only show product and color picker buttons if a product type has been selected */}
+        {this.state.lineItem.productTypeId === -1 ? null :
+          (
+            <View>
+              <View>
+                <Text style={{ marginLeft: 10, marginTop: 20, fontSize: 18, fontWeight: 'bold', color: 'black', }}>Product</Text>
+                <PickerButton
+                  data={this.state.products}
+                  selectedItemId={this.state.lineItem.productId}
+                  navigator={this.props.navigator}
+                  onPickedItem={this.pickProduct} />
+              </View>
+              <View>
+                <Text style={{ marginLeft: 10, marginTop: 20, fontSize: 18, fontWeight: 'bold', color: 'black', }}>Product Color</Text>
+                <PickerButton
+                  data={this.state.colors}
+                  selectedItemId={this.state.lineItem.colorId}
+                  navigator={this.props.navigator}
+                  onPickedItem={this.pickColor} />
+              </View>
+            </View>
+          )
+        }
       </View>
     );
   }

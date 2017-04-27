@@ -16,6 +16,7 @@ class MainApp extends Component {
       <Navigator
         initialRoute={{ name: 'Login' }}
         renderScene={this.renderScene}
+        configureScene={(route, routeStack) => Navigator.SceneConfigs.HorizontalSwipeJumpFromRight}
       />
     )
   }
