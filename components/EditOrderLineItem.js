@@ -190,6 +190,7 @@ class EditOrderLineItem extends Component {
           <Text style={{ marginLeft: 10, marginTop: 10, fontSize: 18, fontWeight: 'bold', color: 'black', }}>Product Type</Text>
           <PickerButton
             data={this.state.productTypes}
+            itemName="Product Type"
             selectedItemId={this.state.lineItem.productTypeId}
             navigator={this.props.navigator}
             onPickedItem={this.pickProductType} />
@@ -202,6 +203,7 @@ class EditOrderLineItem extends Component {
                 <Text style={{ marginLeft: 10, marginTop: 20, fontSize: 18, fontWeight: 'bold', color: 'black', }}>Product</Text>
                 <PickerButton
                   data={this.state.products}
+                  itemName="Product"
                   selectedItemId={this.state.lineItem.productId}
                   navigator={this.props.navigator}
                   onPickedItem={this.pickProduct} />
@@ -210,6 +212,7 @@ class EditOrderLineItem extends Component {
                 <Text style={{ marginLeft: 10, marginTop: 20, fontSize: 18, fontWeight: 'bold', color: 'black', }}>Product Color</Text>
                 <PickerButton
                   data={this.state.colors}
+                  itemName="Product Color"
                   selectedItemId={this.state.lineItem.colorId}
                   navigator={this.props.navigator}
                   onPickedItem={this.pickColor} />

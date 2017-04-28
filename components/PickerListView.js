@@ -65,7 +65,7 @@ class PickerListView extends Component {
               marginTop: (Platform.OS === 'ios') ? 25 : 5,
               marginBottom: 5
             }}
-          >Choose Item
+          >{this.props.itemName}
           </Text>
           <TouchableOpacity onPress={this.cancel}>
             <View style={
