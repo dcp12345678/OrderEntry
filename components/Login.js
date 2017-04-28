@@ -13,13 +13,7 @@ import {
 import Bold from './Bold';
 import AuthApi from '../api/AuthApi';
 import Spinner from 'react-native-loading-spinner-overlay';
-import Icon from 'react-native-vector-icons/FontAwesome';
-
-const myButton = (
-  <Icon.Button name="facebook" backgroundColor="#3b5998" onPress={() => { Alert.alert('hey!'); }} >
-    Click the button!
-  </Icon.Button >
-);
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const authApi = new AuthApi();
 
@@ -129,14 +123,13 @@ class Login extends Component {
           onChangeText={(password) => this.setState({ password })}
           placeholder="Password" />
         <View style={styles.loginButton}>
-          <Button
-            onPress={this.loginOnPress}
-            title="Login"
-            color='#841584'
-          />
+          <Icon.Button style={{ alignSelf: 'center' }} name="lock"
+            backgroundColor="#841584" onPress={this.loginOnPress} >
+            <Text style={{ fontSize: 18, color: 'white', }}>Login</Text>
+          </Icon.Button >
         </View>
-        {myButton}
-      </View>
+
+      </View >
     );
 
   }
