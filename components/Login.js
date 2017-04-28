@@ -13,6 +13,13 @@ import {
 import Bold from './Bold';
 import AuthApi from '../api/AuthApi';
 import Spinner from 'react-native-loading-spinner-overlay';
+import Icon from 'react-native-vector-icons/FontAwesome';
+
+const myButton = (
+  <Icon.Button name="facebook" backgroundColor="#3b5998" onPress={() => { Alert.alert('hey!'); }} >
+    Click the button!
+  </Icon.Button >
+);
 
 const authApi = new AuthApi();
 
@@ -128,6 +135,7 @@ class Login extends Component {
             color='#841584'
           />
         </View>
+        {myButton}
       </View>
     );
 
