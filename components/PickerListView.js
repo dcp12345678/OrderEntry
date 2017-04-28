@@ -42,7 +42,7 @@ class PickerListView extends Component {
     return (
       <View style={{ flex: 1, flexDirection: 'column' }}>
         <TouchableHighlight onPress={() => this.pickItem(item)} style={{ marginTop: 10 }}>
-          <Text style={{ margin: 8, fontSize: 25, fontWeight: 'bold', color: 'purple' }}>{item.name}</Text>
+          <Text style={{ margin: 8, fontSize: 25, color: 'purple' }}>{item.name}</Text>
         </TouchableHighlight>
       </View>
     );
@@ -55,14 +55,17 @@ class PickerListView extends Component {
           flexDirection: 'row', justifyContent: 'space-around', alignSelf: 'stretch', backgroundColor: 'lightgoldenrodyellow', borderWidth: 1,
           borderColor: 'purple',
         }}>
+          <Text>
+          </Text>
           <Text
             style={{
-              fontSize: (Platform.OS === 'ios') ? 17 : 25,
-              color: 'purple',
+              fontSize: (Platform.OS === 'ios') ? 25 : 25,
+              color: 'black',
+              fontWeight: 'bold',
               marginTop: (Platform.OS === 'ios') ? 25 : 5,
               marginBottom: 5
             }}
-          >Choose an item
+          >Choose Item
           </Text>
           <TouchableOpacity onPress={this.cancel}>
             <View style={
@@ -70,13 +73,13 @@ class PickerListView extends Component {
                 backgroundColor: 'purple',
                 borderRadius: 12,
                 marginTop: (Platform.OS === 'ios') ? 25 : 5,
+                marginRight: 5,
                 marginBottom: 5
               }
             }>
               <Text style={{ fontSize: 18, color: 'white', margin: 5, }}>Cancel</Text>
             </View>
           </TouchableOpacity>
-
         </View>
         <ListView
           dataSource={this.state.dataSource}
