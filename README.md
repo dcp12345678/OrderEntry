@@ -1,4 +1,6 @@
 # A react native test project #
+* This app is still under construction.
+
 
 ## ToDo ##
 1. Set up PropTypes for PickerButton
