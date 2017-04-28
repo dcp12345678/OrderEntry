@@ -12,6 +12,7 @@ import {
   Dimensions,
   TouchableOpacity,
   TextInput,
+  Platform,
 } from 'react-native';
 
 
@@ -56,9 +57,9 @@ class PickerListView extends Component {
         }}>
           <Text
             style={{
-              fontSize: 17,
+              fontSize: (Platform.OS === 'ios') ? 17 : 25,
               color: 'purple',
-              marginTop: 25,
+              marginTop: (Platform.OS === 'ios') ? 25 : 5,
               marginBottom: 5
             }}
           >Choose an item
@@ -68,11 +69,11 @@ class PickerListView extends Component {
               {
                 backgroundColor: 'purple',
                 borderRadius: 12,
-                marginTop: 25,
+                marginTop: (Platform.OS === 'ios') ? 25 : 5,
                 marginBottom: 5
               }
             }>
-              <Text style={{ fontSize: 17, color: 'white', margin: 5, }}>Cancel</Text>
+              <Text style={{ fontSize: 18, color: 'white', margin: 5, }}>Cancel</Text>
             </View>
           </TouchableOpacity>
 
