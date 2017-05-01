@@ -14,6 +14,7 @@ import Bold from './Bold';
 import AuthApi from '../api/AuthApi';
 import Spinner from 'react-native-loading-spinner-overlay';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import LinearGradient from 'react-native-linear-gradient';
 
 const authApi = new AuthApi();
 
@@ -55,10 +56,6 @@ const styles = StyleSheet.create({
   purple: {
     color: '#841584'
   },
-  loginButton: {
-    marginTop: 10,
-    alignSelf: 'stretch',
-  }
 });
 
 
@@ -122,13 +119,15 @@ class Login extends Component {
           secureTextEntry={true}
           onChangeText={(password) => this.setState({ password })}
           placeholder="Password" />
-        <View style={styles.loginButton}>
-          <Icon.Button style={{ alignSelf: 'center' }} name="lock"
-            backgroundColor="#841584" onPress={this.loginOnPress} >
-            <Text style={{ fontSize: 18, color: 'white', }}>Login</Text>
-          </Icon.Button >
-        </View>
-
+        <LinearGradient style={{ borderRadius: 5, alignSelf: 'stretch', marginTop: 10 }}
+          colors={['#4c669f', '#3b5998', '#192f6a']} >
+          <TouchableHighlight underlayColor='purple' onPress={this.loginOnPress}>
+            <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+              <Icon name="lock" color='white' size={20} style={{ alignSelf: 'center', marginLeft: 5, marginTop: 5, marginBottom: 5 }} />
+              <Text style={{ fontSize: 20, color: 'white', marginLeft: 5, marginTop: 5, marginBottom: 5 }}>Login</Text>
+            </View>
+          </TouchableHighlight>
+        </LinearGradient>
       </View >
     );
 
