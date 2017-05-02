@@ -22,7 +22,7 @@ const ordersApi = new OrdersApi();
 const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
-    backgroundColor: '#fff',
+    //backgroundColor: '#fff',
   },
   title: {
     backgroundColor: '#0f1b29',

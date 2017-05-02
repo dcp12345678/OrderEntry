@@ -29,7 +29,7 @@ const winWidth = Dimensions.get('window').width;
 
 const styles = StyleSheet.create({
   mainHeader: {
-    backgroundColor: 'lightgoldenrodyellow',
+    backgroundColor: 'skyblue',
     borderWidth: 1,
     borderColor: 'goldenrod',
     //height: 40,
@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
     flexDirection: 'column',
-    backgroundColor: '#fff',
+    //backgroundColor: '#fff',
   },
   headerText: {
     fontSize: 18,

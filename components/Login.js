@@ -9,11 +9,13 @@ import {
   TouchableHighlight,
   Button,
   Alert,
+  Platform,
 } from 'react-native';
 import Bold from './Bold';
 import AuthApi from '../api/AuthApi';
 import Spinner from 'react-native-loading-spinner-overlay';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
+import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import LinearGradient from 'react-native-linear-gradient';
 
 const authApi = new AuthApi();
@@ -25,15 +27,6 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     alignItems: 'center',
     padding: 10
-  },
-  headerItem: {
-    backgroundColor: 'lightgoldenrodyellow',
-    borderWidth: 1,
-    borderColor: 'goldenrod',
-    alignItems: 'center',
-    alignSelf: 'stretch',
-    margin: 30,
-    fontSize: 17
   },
   item: {
     height: 40,
@@ -103,31 +96,48 @@ class Login extends Component {
 
   render() {
     return (
-      <View style={styles.container}>
-        <Spinner visible={this.state.showSpinner} textContent={"Logging In..."} textStyle={{ color: '#FFF' }} />
-        <Text style={[styles.headerItem, styles.bold, styles.purple, { alignSelf: 'center' }]}>
-          Welcome to the Order Entry system
-        </Text>
-        <TextInput
-          style={styles.item}
-          autoCapitalize='none'
-          onChangeText={(loginId) => this.setState({ loginId })}
-          placeholder="Login Id" />
-        <TextInput
-          style={styles.item}
-          autoCapitalize='none'
-          secureTextEntry={true}
-          onChangeText={(password) => this.setState({ password })}
-          placeholder="Password" />
-        <LinearGradient style={{ borderRadius: 5, alignSelf: 'stretch', marginTop: 10 }}
-          colors={['#4c669f', '#3b5998', '#192f6a']} >
-          <TouchableHighlight underlayColor='purple' onPress={this.loginOnPress}>
-            <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-              <Icon name="lock" color='white' size={20} style={{ alignSelf: 'center', marginLeft: 5, marginTop: 5, marginBottom: 5 }} />
-              <Text style={{ fontSize: 20, color: 'white', marginLeft: 5, marginTop: 5, marginBottom: 5 }}>Login</Text>
-            </View>
-          </TouchableHighlight>
-        </LinearGradient>
+      <View style={{ flex: 1, flexDirection: 'column' }}>
+        <View style={{
+          flexDirection: 'row', justifyContent: 'space-around', alignSelf: 'stretch', backgroundColor: 'skyblue',
+          marginBottom: 30,
+        }}>
+          <View style={{ flexDirection: 'row' }}>
+            <Text style={[
+              {
+                color: 'darkblue',
+                fontWeight: 'bold',
+                marginBottom: 0,
+                padding: 0,
+                fontSize: 20,
+              }]}>
+              Order Entry System
+         </Text>
+            <FontAwesomeIcon name="book" color='darkblue' size={25} style={{ alignSelf: 'center', marginLeft: 10, marginTop: 5, marginBottom: 5 }} />
+          </View>
+        </View>
+        <View style={styles.container}>
+          <Spinner visible={this.state.showSpinner} textContent={"Logging In..."} textStyle={{ color: '#FFF' }} />
+          <TextInput
+            style={styles.item}
+            autoCapitalize='none'
+            onChangeText={(loginId) => this.setState({ loginId })}
+            placeholder="Login Id" />
+          <TextInput
+            style={styles.item}
+            autoCapitalize='none'
+            secureTextEntry={true}
+            onChangeText={(password) => this.setState({ password })}
+            placeholder="Password" />
+          <LinearGradient style={{ borderRadius: 5, alignSelf: 'stretch', marginTop: 10 }}
+            colors={['#4c669f', '#3b5998', '#192f6a']} >
+            <TouchableHighlight underlayColor='purple' onPress={this.loginOnPress}>
+              <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+                <MaterialIcon name="lock" color='white' size={20} style={{ alignSelf: 'center', marginLeft: 5, marginTop: 5, marginBottom: 5 }} />
+                <Text style={{ fontSize: 20, color: 'white', marginLeft: 5, marginTop: 5, marginBottom: 5 }}>Login</Text>
+              </View>
+            </TouchableHighlight>
+          </LinearGradient>
+        </View >
       </View >
     );
 
