@@ -3,6 +3,7 @@ import {
   Navigator,
   Image,
   StyleSheet,
+  View,
 } from 'react-native';
 import Login from './Login';
 import MainForm from './MainForm';
@@ -54,11 +55,17 @@ class MainApp extends Component {
         break;
     }
 
-    return (
+    // no longer using background image, just using solid color for background instead
+    /*return (
       <Image source={require('../images/background.jpg')}
         style={styles.backgroundImage}>
         {component}
       </Image>
+    );*/
+    return (
+      <View style={{ flex: 1, backgroundColor: 'lightsteelblue' }}>
+        {component}
+      </View>
     );
   }
 };

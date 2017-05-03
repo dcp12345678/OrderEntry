@@ -28,10 +28,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 10
   },
-  item: {
+  textInput: {
     height: 40,
     fontSize: 20,
-    alignSelf: 'stretch'
+    alignSelf: 'stretch',
+    backgroundColor: 'white',
+    borderRadius: 7,
+    color: 'darkblue',
+    paddingLeft: 7,
   },
   headline: {
     fontFamily: 'Georgia',
@@ -94,11 +98,12 @@ class Login extends Component {
     });
   }
 
+  // update for ios
   render() {
     return (
       <View style={{ flex: 1, flexDirection: 'column' }}>
         <View style={{
-          flexDirection: 'row', justifyContent: 'space-around', alignSelf: 'stretch', backgroundColor: 'skyblue',
+          flexDirection: 'row', justifyContent: 'space-around', alignSelf: 'stretch', backgroundColor: 'steelblue',
           marginBottom: 30,
         }}>
           <View style={{ flexDirection: 'row' }}>
@@ -109,30 +114,39 @@ class Login extends Component {
                 marginBottom: 0,
                 padding: 0,
                 fontSize: 20,
+                marginTop: (Platform.OS === 'ios') ? 25 : 5,
               }]}>
               Order Entry System
          </Text>
-            <FontAwesomeIcon name="book" color='darkblue' size={25} style={{ alignSelf: 'center', marginLeft: 10, marginTop: 5, marginBottom: 5 }} />
+            <FontAwesomeIcon name="book" color='darkblue' size={25}
+              style={
+                {
+                  alignSelf: 'center',
+                  marginLeft: 10,
+                  marginTop: (Platform.OS === 'ios') ? 25 : 5,
+                  marginBottom: 5
+                }
+              } />
           </View>
         </View>
         <View style={styles.container}>
           <Spinner visible={this.state.showSpinner} textContent={"Logging In..."} textStyle={{ color: '#FFF' }} />
           <TextInput
-            style={styles.item}
+            style={styles.textInput}
             autoCapitalize='none'
             onChangeText={(loginId) => this.setState({ loginId })}
             placeholder="Login Id" />
           <TextInput
-            style={styles.item}
+            style={[styles.textInput, { marginTop: 10 }]}
             autoCapitalize='none'
             secureTextEntry={true}
             onChangeText={(password) => this.setState({ password })}
             placeholder="Password" />
-          <LinearGradient style={{ borderRadius: 5, alignSelf: 'stretch', marginTop: 10 }}
+          <LinearGradient style={{ borderRadius: 5, alignSelf: 'stretch', marginTop: 20 }}
             colors={['#4c669f', '#3b5998', '#192f6a']} >
-            <TouchableHighlight underlayColor='purple' onPress={this.loginOnPress}>
+            <TouchableHighlight underlayColor='steelblue' onPress={this.loginOnPress}>
               <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-                <MaterialIcon name="lock" color='white' size={20} style={{ alignSelf: 'center', marginLeft: 5, marginTop: 5, marginBottom: 5 }} />
+                <MaterialIcon name='lock' color='white' size={20} style={{ alignSelf: 'center', marginLeft: 5, marginTop: 5, marginBottom: 5 }} />
                 <Text style={{ fontSize: 20, color: 'white', marginLeft: 5, marginTop: 5, marginBottom: 5 }}>Login</Text>
               </View>
             </TouchableHighlight>
