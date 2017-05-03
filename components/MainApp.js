@@ -32,32 +32,32 @@ class MainApp extends Component {
   }
 
   renderScene(route, navigator) {
-    let comp;
+    let component;
     switch (route.name) {
       case 'Login':
-        comp = (<Login navigator={navigator} {...route.passProps} />);
+        component = (<Login navigator={navigator} {...route.passProps} />);
         break;
       case 'MainForm':
-        comp = (<MainForm navigator={navigator} {...route.passProps} />);
+        component = (<MainForm navigator={navigator} {...route.passProps} />);
         break;
       case 'OrderDetails':
-        comp = (<OrderDetails navigator={navigator} {...route.passProps} />);
+        component = (<OrderDetails navigator={navigator} {...route.passProps} />);
         break;
       case 'EditOrder':
-        comp = (<EditOrder navigator={navigator} {...route.passProps} />);
+        component = (<EditOrder navigator={navigator} {...route.passProps} />);
         break;
       case 'EditOrderLineItem':
-        comp = (<EditOrderLineItem navigator={navigator} {...route.passProps} />);
+        component = (<EditOrderLineItem navigator={navigator} {...route.passProps} />);
         break;
       case 'PickerListView':
-        comp = (<PickerListView navigator={navigator} {...route.passProps} />);
+        component = (<PickerListView navigator={navigator} {...route.passProps} />);
         break;
     }
 
     return (
       <Image source={require('../images/background.jpg')}
         style={styles.backgroundImage}>
-        {comp}
+        {component}
       </Image>
     );
   }
