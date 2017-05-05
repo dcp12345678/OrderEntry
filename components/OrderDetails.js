@@ -7,13 +7,16 @@ import {
   Text,
   TouchableHighlight,
   Button,
-  Alert
+  Alert,
+  Platform,
 } from 'react-native';
 import OrdersApi from '../api/OrdersApi';
 import _ from 'lodash';
 import Helper from '../helpers/Helper';
 import co from 'co';
 import Promise from 'bluebird';
+import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
+import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 
 const basketIcon = require('../images/basket.png');
 const carIcon = require('../images/car.png');
@@ -115,7 +118,8 @@ const styles = StyleSheet.create({
   },
   headerText: {
     fontSize: 18,
-    color: 'purple'
+    color: 'darkblue',
+    fontWeight: 'bold'
   },
   backButton: {
     marginTop: 10,
@@ -188,6 +192,10 @@ class OrderDetails extends Component {
     this.props.navigator.pop();
   }
 
+  addLineItem = () => {
+
+  }
+
   render() {
     if (_.isUndefined(this.state.dataSource)) {
       return (
@@ -197,16 +205,41 @@ class OrderDetails extends Component {
       );
     }
     return (
-      <View style={styles.mainContainer}>
-        <View style={styles.backButton}>
-          <Button
-            onPress={this.goBackOnPress}
-            title="Back"
-            color='#841584'
-          />
-        </View>
-        <View style={styles.mainHeader}>
-          <Text style={styles.headerText}>Order Details Page for order {this.props.orderId}</Text>
+      <View style={{ flex: 1, flexDirection: 'column' }}>
+        <View style={{
+          flexDirection: 'row', justifyContent: 'space-between', alignSelf: 'stretch', backgroundColor: 'steelblue',
+          marginBottom: 5,
+        }}>
+          <TouchableHighlight
+            style={{
+              marginTop: (Platform.OS === 'ios') ? 25 : 5,
+              borderRadius: 20,
+            }}
+            underlayColor='#578dba' onPress={this.goBackOnPress}>
+            <FontAwesomeIcon name='arrow-circle-left' color='white' size={25} style={{ alignSelf: 'center', marginLeft: 5, marginTop: 5, marginBottom: 5, marginRight: 5 }} />
+          </TouchableHighlight>
+          <Text style={[
+            {
+              color: 'darkblue',
+              fontWeight: 'bold',
+              marginBottom: 0,
+              padding: 0,
+              fontSize: 20,
+              alignSelf: 'center',
+              marginTop: (Platform.OS === 'ios') ? 25 : 5,
+            }]}>
+            Order Details ({this.props.orderId})
+          </Text>
+          <TouchableHighlight
+            style={{
+              marginTop: (Platform.OS === 'ios') ? 25 : 5,
+              borderRadius: 20,
+            }}
+            underlayColor='#578dba' onPress={this.addLineItem}>
+            <View style={{ marginRight: 8, flexDirection: 'row', justifyContent: 'center' }}>
+              <MaterialIcon name='add-circle-outline' color='white' size={25} style={{ alignSelf: 'center', marginLeft: 5, marginTop: 5, marginBottom: 5, marginRight: 5 }} />
+            </View>
+          </TouchableHighlight>
         </View>
         <ListView
           dataSource={this.state.dataSource}
