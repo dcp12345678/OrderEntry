@@ -98,7 +98,6 @@ class Login extends Component {
     });
   }
 
-  // update for ios
   render() {
     return (
       <View style={{ flex: 1, flexDirection: 'column' }}>
@@ -117,7 +116,7 @@ class Login extends Component {
                 marginTop: (Platform.OS === 'ios') ? 25 : 5,
               }]}>
               Order Entry System
-         </Text>
+            </Text>
             <FontAwesomeIcon name="book" color='darkblue' size={25}
               style={
                 {
