@@ -175,12 +175,34 @@ class RecentOrders extends Component {
     // if isExpanded is true, we need to show additional information for this order
     if (record.isExpanded) {
       let products = [];
+      for (let key in record.products) {
+        products.push(
+          <View key={key} style={{ flex: 1, flexDirection: 'row' }}>
+            <View key={key} style={
+              {
+                flex: 1,
+                flexDirection: 'row',
+                borderWidth: 1,
+                borderColor: 'white',
+                backgroundColor: 'steelblue',
+                margin: 1,
+              }
+            }>
+              <Text key={key + '_text'} style={{ flex: .8, color: 'white', borderWidth: 1, borderColor: 'white', padding: 2 }}>{key}:</Text>
+              <Text key={key + '_cnt'} style={{ flex: .2, color: 'white', borderWidth: 1, borderColor: 'white', padding: 2 }}>{record.products[key]}</Text>
+            </View>
+          </View>
+        );
+      };
+
       let content = [];
       content.push(
-        <View key="view_expandedHeader" style={{ flexDirection: 'row' }}>
-          <Text key="expandedHeader" style={[styles.orderDetail, { fontWeight: '600' }]}>Order Items:</Text>
+        <View key="view_expandedHeader" style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+          <Text key="expandedHeader" style={[styles.orderDetail, { fontWeight: '600' }]}>Items:</Text>
 
-          <View style={{ marginLeft: 25 }}>
+          <View key="expandedDetail" style={{ flex: 1, marginLeft: 10, marginRight: 10, marginBottom: 5 }}>{products}</View>
+
+          <View>
             <TouchableHighlight
               style={{
                 borderRadius: 20,
@@ -197,29 +219,6 @@ class RecentOrders extends Component {
 
         </View >
       );
-      for (let key in record.products) {
-        products.push(
-          <View key={key} style={{ flex: 1, flexDirection: 'row' }}>
-            <View style={
-              {
-                flex: .5,
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                borderWidth: 1,
-                borderColor: 'white',
-                backgroundColor: 'steelblue',
-                margin: 1,
-              }}
-              key={key}>
-              <Text key={key + '_text'} style={{ flex: .6, color: 'white', borderWidth: 1, borderColor: 'white', padding: 2 }}>{key}:</Text>
-              <Text key={key + '_cnt'} style={{ flex: .4, color: 'white', borderWidth: 1, borderColor: 'white', padding: 2 }}>{record.products[key]}</Text>
-            </View>
-            <View style={{ flex: .5 }}>
-            </View>
-          </View>
-        );
-      };
-      content.push(<View key="expandedDetail" style={{ marginBottom: 8, }}>{products}</View>);
       expandedContent = (<View>{content}</View>);
     }
 
@@ -230,7 +229,7 @@ class RecentOrders extends Component {
             <View style={[styles.info, { backgroundColor: '#5282aa', borderRadius: 9, }]}>
               <View style={{ flexDirection: 'row' }}>
                 <Text style={styles.orderDetail}>Order: {record.id}</Text>
-                <Text style={{ marginLeft: 5, color: 'white', alignSelf: 'center'}}>({record.lineItems.length} items)</Text>
+                <Text style={{ marginLeft: 5, color: 'white', alignSelf: 'center' }}>({record.lineItems.length} items)</Text>
               </View>
               <Text style={styles.date}>Last Update: {Helper.formatDate(record.updateDate)}</Text>
               {expandedContent}
