@@ -178,9 +178,9 @@ class RecentOrders extends Component {
       let content = [];
       content.push(
         <View key="view_expandedHeader" style={{ flexDirection: 'row' }}>
-          <Text key="expandedHeader" style={[styles.orderDetail, { fontWeight: '600' }]}>Items Purchased:</Text>
+          <Text key="expandedHeader" style={[styles.orderDetail, { fontWeight: '600' }]}>Order Items:</Text>
 
-          <View style={{ marginLeft: 30 }}>
+          <View style={{ marginLeft: 25 }}>
             <TouchableHighlight
               style={{
                 borderRadius: 20,
