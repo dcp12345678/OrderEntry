@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 import {
   Navigator,
+  Image,
+  StyleSheet,
+  View,
 } from 'react-native';
 import Login from './Login';
 import MainForm from './MainForm';
@@ -9,6 +12,14 @@ import EditOrder from './EditOrder';
 import EditOrderLineItem from './EditOrderLineItem';
 import PickerListView from './PickerListView';
 
+const styles = StyleSheet.create({
+  backgroundImage: {
+    flex: 1,
+    width: null,
+    height: null,
+    resizeMode: 'cover'
+  }
+});
 class MainApp extends Component {
 
   render() {
@@ -22,32 +33,40 @@ class MainApp extends Component {
   }
 
   renderScene(route, navigator) {
+    let component;
     switch (route.name) {
       case 'Login':
-        return (
-          <Login navigator={navigator} {...route.passProps} />
-        );
+        component = (<Login navigator={navigator} {...route.passProps} />);
+        break;
       case 'MainForm':
-        return (
-          <MainForm navigator={navigator} {...route.passProps} />
-        );
+        component = (<MainForm navigator={navigator} {...route.passProps} />);
+        break;
       case 'OrderDetails':
-        return (
-          <OrderDetails navigator={navigator} {...route.passProps} />
-        );
+        component = (<OrderDetails navigator={navigator} {...route.passProps} />);
+        break;
       case 'EditOrder':
-        return (
-          <EditOrder navigator={navigator} {...route.passProps} />
-        );
+        component = (<EditOrder navigator={navigator} {...route.passProps} />);
+        break;
       case 'EditOrderLineItem':
-        return (
-          <EditOrderLineItem navigator={navigator} {...route.passProps} />
-        );
+        component = (<EditOrderLineItem navigator={navigator} {...route.passProps} />);
+        break;
       case 'PickerListView':
-        return (
-          <PickerListView navigator={navigator} {...route.passProps} />
-        );
+        component = (<PickerListView navigator={navigator} {...route.passProps} />);
+        break;
     }
+
+    // no longer using background image, just using solid color for background instead
+    /*return (
+      <Image source={require('../images/background.jpg')}
+        style={styles.backgroundImage}>
+        {component}
+      </Image>
+    );*/
+    return (
+      <View style={{ flex: 1, backgroundColor: 'lightsteelblue' }}>
+        {component}
+      </View>
+    );
   }
 };
 

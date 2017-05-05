@@ -52,7 +52,7 @@ class PickerListView extends Component {
     return (
       <View style={{ flex: 1,}}>
         <View style={{
-          flexDirection: 'row', justifyContent: 'space-around', alignSelf: 'stretch', backgroundColor: 'lightgoldenrodyellow', borderWidth: 1,
+          flexDirection: 'row', justifyContent: 'space-around', alignSelf: 'stretch', backgroundColor: 'skyblue', borderWidth: 1,
           borderColor: 'purple',
         }}>
           <Text>
