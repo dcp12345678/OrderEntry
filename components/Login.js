@@ -30,7 +30,7 @@ const styles = StyleSheet.create({
   },
   textInput: {
     height: 40,
-    fontSize: 20,
+    fontSize: (Platform.OS === 'ios') ? 20 : 18,
     alignSelf: 'stretch',
     backgroundColor: 'white',
     borderRadius: 7,
@@ -133,11 +133,13 @@ class Login extends Component {
           <TextInput
             style={styles.textInput}
             autoCapitalize='none'
+            underlineColorAndroid='transparent'
             onChangeText={(loginId) => this.setState({ loginId })}
             placeholder="Login Id" />
           <TextInput
             style={[styles.textInput, { marginTop: 10 }]}
             autoCapitalize='none'
+            underlineColorAndroid='transparent'
             secureTextEntry={true}
             onChangeText={(password) => this.setState({ password })}
             placeholder="Password" />
