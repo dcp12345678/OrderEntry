@@ -256,7 +256,7 @@ class RecentOrders extends Component {
               borderRadius: 20,
             }}
             underlayColor='#578dba' onPress={this.newOrderOnPress}>
-            <MaterialIcon name='add-circle-outline' color='white' size={25} style={{ alignSelf: 'center', marginLeft: 5, marginTop: 5, marginBottom: 5, marginRight: 5 }} />
+            <MaterialIcon name='add-circle-outline' color='white' size={30} style={{ alignSelf: 'center', marginLeft: 5, marginTop: 5, marginBottom: 5, marginRight: 5 }} />
           </TouchableHighlight>
           <Text style={[
             {
@@ -277,7 +277,7 @@ class RecentOrders extends Component {
             }}
             underlayColor='#578dba' onPress={this.searchOrdersOnPress}>
             <View style={{ marginRight: 8, flexDirection: 'row', justifyContent: 'center' }}>
-              <MaterialIcon name='search' color='white' size={25} style={{ alignSelf: 'center', marginLeft: 5, marginTop: 5, marginBottom: 5, marginRight: 5 }} />
+              <MaterialIcon name='search' color='white' size={30} style={{ alignSelf: 'center', marginLeft: 5, marginTop: 5, marginBottom: 5, marginRight: 5 }} />
             </View>
           </TouchableHighlight>
         </View>

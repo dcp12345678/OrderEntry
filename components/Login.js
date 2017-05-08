@@ -117,7 +117,7 @@ class Login extends Component {
               }]}>
               Order Entry System
             </Text>
-            <FontAwesomeIcon name="book" color='darkblue' size={25}
+            <FontAwesomeIcon name="book" color='darkblue' size={30}
               style={
                 {
                   alignSelf: 'center',
