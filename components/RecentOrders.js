@@ -175,18 +175,40 @@ class RecentOrders extends Component {
     // if isExpanded is true, we need to show additional information for this order
     if (record.isExpanded) {
       let products = [];
+      for (let key in record.products) {
+        products.push(
+          <View key={key} style={{ flex: 1, flexDirection: 'row' }}>
+            <View key={key} style={
+              {
+                flex: 1,
+                flexDirection: 'row',
+                borderWidth: 1,
+                borderColor: 'white',
+                backgroundColor: 'steelblue',
+                margin: 1,
+              }
+            }>
+              <Text key={key + '_text'} style={{ flex: .8, fontSize: 15, color: 'white', borderWidth: 1, borderColor: 'white', padding: 2 }}>{key}:</Text>
+              <Text key={key + '_cnt'} style={{ flex: .2, fontSize: 15, color: 'white', borderWidth: 1, borderColor: 'white', padding: 2 }}>{record.products[key]}</Text>
+            </View>
+          </View>
+        );
+      };
+
       let content = [];
       content.push(
-        <View key="view_expandedHeader" style={{ flexDirection: 'row' }}>
-          <Text key="expandedHeader" style={[styles.orderDetail, { fontWeight: '600' }]}>Items Purchased:</Text>
+        <View key="view_expandedHeader" style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+          <Text key="expandedHeader" style={[styles.orderDetail, { fontWeight: '600' }]}>Items:</Text>
 
-          <View style={{ marginLeft: 30 }}>
+          <View key="expandedDetail" style={{ flex: 1, marginLeft: 10, marginRight: 10, marginBottom: 5 }}>{products}</View>
+
+          <View>
             <TouchableHighlight
               style={{
                 borderRadius: 20,
               }}
               underlayColor='#578dba' onPress={() => { this.viewOrderDetailsOnPress(record.id); }}>
-              <FontAwesomeIcon name='edit' color='white' size={25}
+              <FontAwesomeIcon name='edit' color='white' size={30}
                 style={
                   {
                     alignSelf: 'center',
@@ -197,29 +219,6 @@ class RecentOrders extends Component {
 
         </View >
       );
-      for (let key in record.products) {
-        products.push(
-          <View key={key} style={{ flex: 1, flexDirection: 'row' }}>
-            <View style={
-              {
-                flex: .5,
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                borderWidth: 1,
-                borderColor: 'white',
-                backgroundColor: 'steelblue',
-                margin: 1,
-              }}
-              key={key}>
-              <Text key={key + '_text'} style={{ flex: .6, color: 'white', borderWidth: 1, borderColor: 'white', padding: 2 }}>{key}:</Text>
-              <Text key={key + '_cnt'} style={{ flex: .4, color: 'white', borderWidth: 1, borderColor: 'white', padding: 2 }}>{record.products[key]}</Text>
-            </View>
-            <View style={{ flex: .5 }}>
-            </View>
-          </View>
-        );
-      };
-      content.push(<View key="expandedDetail" style={{ marginBottom: 8, }}>{products}</View>);
       expandedContent = (<View>{content}</View>);
     }
 
@@ -230,7 +229,7 @@ class RecentOrders extends Component {
             <View style={[styles.info, { backgroundColor: '#5282aa', borderRadius: 9, }]}>
               <View style={{ flexDirection: 'row' }}>
                 <Text style={styles.orderDetail}>Order: {record.id}</Text>
-                <Text style={{ marginLeft: 5, color: 'white', alignSelf: 'center'}}>({record.lineItems.length} items)</Text>
+                <Text style={{ marginLeft: 5, color: 'white', alignSelf: 'center' }}>({record.lineItems.length} items)</Text>
               </View>
               <Text style={styles.date}>Last Update: {Helper.formatDate(record.updateDate)}</Text>
               {expandedContent}
@@ -257,7 +256,7 @@ class RecentOrders extends Component {
               borderRadius: 20,
             }}
             underlayColor='#578dba' onPress={this.newOrderOnPress}>
-            <MaterialIcon name='add-circle-outline' color='white' size={25} style={{ alignSelf: 'center', marginLeft: 5, marginTop: 5, marginBottom: 5, marginRight: 5 }} />
+            <MaterialIcon name='add-circle-outline' color='white' size={30} style={{ alignSelf: 'center', marginLeft: 5, marginTop: 5, marginBottom: 5, marginRight: 5 }} />
           </TouchableHighlight>
           <Text style={[
             {
@@ -278,7 +277,7 @@ class RecentOrders extends Component {
             }}
             underlayColor='#578dba' onPress={this.searchOrdersOnPress}>
             <View style={{ marginRight: 8, flexDirection: 'row', justifyContent: 'center' }}>
-              <MaterialIcon name='search' color='white' size={25} style={{ alignSelf: 'center', marginLeft: 5, marginTop: 5, marginBottom: 5, marginRight: 5 }} />
+              <MaterialIcon name='search' color='white' size={30} style={{ alignSelf: 'center', marginLeft: 5, marginTop: 5, marginBottom: 5, marginRight: 5 }} />
             </View>
           </TouchableHighlight>
         </View>
