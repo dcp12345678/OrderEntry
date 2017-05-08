@@ -208,7 +208,7 @@ class RecentOrders extends Component {
                 borderRadius: 20,
               }}
               underlayColor='#578dba' onPress={() => { this.viewOrderDetailsOnPress(record.id); }}>
-              <FontAwesomeIcon name='edit' color='white' size={25}
+              <FontAwesomeIcon name='edit' color='white' size={30}
                 style={
                   {
                     alignSelf: 'center',
