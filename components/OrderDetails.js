@@ -18,10 +18,9 @@ import Promise from 'bluebird';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 
-const basketIcon = require('../images/basket.png');
-const carIcon = require('../images/car.png');
-const truckIcon = require('../images/truck.png');
-const motorcycleIcon = require('../images/motorcycle.png');
+const carIcon = require('../images/honda_accord.jpg');
+const truckIcon = require('../images/ford_f150.jpg');
+const motorcycleIcon = require('../images/kawasaki_motorcycle.jpg');
 
 const styles = StyleSheet.create({
   mainHeader: {
@@ -54,8 +53,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginLeft: 10,
     marginRight: 10,
-    paddingTop: 20,
-    paddingBottom: 20
+    paddingTop: 8,
+    paddingBottom: 8
   },
   iconContainer: {
     alignItems: 'center',
@@ -68,29 +67,10 @@ const styles = StyleSheet.create({
     width: 50,
   },
   icon: {
-    tintColor: '#fff',
-    height: 25,
-    width: 25
-  },
-  carIcon: {
-    tintColor: 'green',
-    height: 25,
-    width: 25
-  },
-  truckIcon: {
-    tintColor: 'blue',
-    height: 25,
-    width: 25
-  },
-  motorcycleIcon: {
-    tintColor: 'red',
-    height: 25,
-    width: 25
-  },
-  info: {
-    flex: 1,
-    paddingLeft: 25,
-    paddingRight: 25
+    height: 70,
+    width: 100,
+    borderColor: 'steelblue',
+    borderWidth: 3,
   },
   items: {
     fontWeight: 'bold',
@@ -98,8 +78,8 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   detail: {
-    color: 'purple',
-    fontSize: 18,
+    color: 'darkblue',
+    fontSize: 15,
   },
   total: {
     width: 80,
@@ -158,30 +138,39 @@ class OrderDetails extends Component {
   }
 
   renderRow = (record) => {
-    debugger;
     let iconImage;
     switch (record.productTypeName) {
       case 'Car':
-        iconImage = <Image source={carIcon} style={styles.carIcon} />
+        iconImage = <Image resizeMode='contain' source={carIcon} style={styles.icon} />
         break;
       case 'Truck':
-        iconImage = <Image source={truckIcon} style={styles.truckIcon} />
+        iconImage = <Image resizeMode='contain' source={truckIcon} style={styles.icon} />
         break;
       case 'Motorcycle':
-        iconImage = <Image source={motorcycleIcon} style={styles.motorcycleIcon} />
+        iconImage = <Image resizeMode='contain' source={motorcycleIcon} style={styles.icon} />
         break;
     }
     return (
       <View>
         <View style={styles.row}>
-          <View style={styles.iconContainer}>
+          <View style={{ backgroundColor: 'white' }}>
             {iconImage}
           </View>
-          <View style={styles.info}>
-            <Text style={styles.detail}>Line Item Id: {record.id}</Text>
-            <Text style={styles.detail}>Type: {record.productTypeName}</Text>
-            <Text style={styles.detail}>Name: {record.productName}</Text>
-            <Text style={styles.detail}>Color: {record.colorName}</Text>
+          <View style={{
+            flex: 1,
+            paddingLeft: 8,
+            paddingRight: 8,
+          }}>
+            <Text style={{ fontSize: 23, color: 'darkblue', fontWeight: 'bold' }}>{record.productName}</Text>
+            <View style={{ flex: 1 }}>
+              <View style={{ flex: 1, flexDirection: 'row' }}>
+                <Text style={{ flex: .4, color: 'darkblue', fontSize: 13 }}>Color: {record.colorName}</Text>
+                <Text style={{ flex: .6, color: 'darkblue', fontSize: 13 }}>Item Type: {record.productTypeName}</Text>
+              </View>
+              <View style={{ flex: 1, flexDirection: 'row' }}>
+                <Text style={{ color: 'darkblue' }}>Line Item Id: {record.id}</Text>
+              </View>
+            </View>
           </View>
         </View>
       </View>
@@ -216,7 +205,7 @@ class OrderDetails extends Component {
               borderRadius: 20,
             }}
             underlayColor='#578dba' onPress={this.goBackOnPress}>
-            <FontAwesomeIcon name='arrow-circle-left' color='white' size={25} style={{ alignSelf: 'center', marginLeft: 5, marginTop: 5, marginBottom: 5, marginRight: 5 }} />
+            <FontAwesomeIcon name='arrow-circle-left' color='white' size={30} style={{ alignSelf: 'center', marginLeft: 5, marginTop: 5, marginBottom: 5, marginRight: 5 }} />
           </TouchableHighlight>
           <Text style={[
             {
@@ -237,7 +226,7 @@ class OrderDetails extends Component {
             }}
             underlayColor='#578dba' onPress={this.addLineItem}>
             <View style={{ marginRight: 8, flexDirection: 'row', justifyContent: 'center' }}>
-              <MaterialIcon name='add-circle-outline' color='white' size={25} style={{ alignSelf: 'center', marginLeft: 5, marginTop: 5, marginBottom: 5, marginRight: 5 }} />
+              <MaterialIcon name='add-circle-outline' color='white' size={30} style={{ alignSelf: 'center', marginLeft: 5, marginTop: 5, marginBottom: 5, marginRight: 5 }} />
             </View>
           </TouchableHighlight>
         </View>

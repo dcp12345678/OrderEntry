@@ -188,8 +188,8 @@ class RecentOrders extends Component {
                 margin: 1,
               }
             }>
-              <Text key={key + '_text'} style={{ flex: .8, color: 'white', borderWidth: 1, borderColor: 'white', padding: 2 }}>{key}:</Text>
-              <Text key={key + '_cnt'} style={{ flex: .2, color: 'white', borderWidth: 1, borderColor: 'white', padding: 2 }}>{record.products[key]}</Text>
+              <Text key={key + '_text'} style={{ flex: .8, fontSize: 15, color: 'white', borderWidth: 1, borderColor: 'white', padding: 2 }}>{key}:</Text>
+              <Text key={key + '_cnt'} style={{ flex: .2, fontSize: 15, color: 'white', borderWidth: 1, borderColor: 'white', padding: 2 }}>{record.products[key]}</Text>
             </View>
           </View>
         );

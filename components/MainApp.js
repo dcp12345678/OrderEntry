@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import {
-  Navigator,
   Image,
   StyleSheet,
   View,
@@ -11,6 +10,7 @@ import OrderDetails from './OrderDetails';
 import EditOrder from './EditOrder';
 import EditOrderLineItem from './EditOrderLineItem';
 import PickerListView from './PickerListView';
+import NavigationExperimental from 'react-native-deprecated-custom-components';
 
 const styles = StyleSheet.create({
   backgroundImage: {
@@ -24,10 +24,10 @@ class MainApp extends Component {
 
   render() {
     return (
-      <Navigator
+      <NavigationExperimental.Navigator
         initialRoute={{ name: 'Login' }}
         renderScene={this.renderScene}
-        configureScene={(route, routeStack) => Navigator.SceneConfigs.HorizontalSwipeJumpFromRight}
+        configureScene={(route, routeStack) => NavigationExperimental.Navigator.SceneConfigs.HorizontalSwipeJumpFromRight}
       />
     )
   }
