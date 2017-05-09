@@ -19,10 +19,6 @@ import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import Config from '../config';
 
-const carIcon = require('../images/honda_accord.jpg');
-const truckIcon = require('../images/ford_f150.jpg');
-const motorcycleIcon = require('../images/kawasaki_motorcycle.jpg');
-
 const styles = StyleSheet.create({
   mainHeader: {
     backgroundColor: 'lightgoldenrodyellow',
