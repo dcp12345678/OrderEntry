@@ -17,6 +17,7 @@ import co from 'co';
 import Promise from 'bluebird';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
+import Config from '../config';
 
 const carIcon = require('../images/honda_accord.jpg');
 const truckIcon = require('../images/ford_f150.jpg');
@@ -138,18 +139,9 @@ class OrderDetails extends Component {
   }
 
   renderRow = (record) => {
-    let iconImage;
-    switch (record.productTypeName) {
-      case 'Car':
-        iconImage = <Image resizeMode='contain' source={carIcon} style={styles.icon} />
-        break;
-      case 'Truck':
-        iconImage = <Image resizeMode='contain' source={truckIcon} style={styles.icon} />
-        break;
-      case 'Motorcycle':
-        iconImage = <Image resizeMode='contain' source={motorcycleIcon} style={styles.icon} />
-        break;
-    }
+    // set up image URL for product (e.g. product image could be a picture of a Ford F150 truck, for example)
+    let src = Config.restApi.baseUrl + record.productImageUri;
+    let iconImage = <Image resizeMode='contain' source={{uri: src}} style={styles.icon} />;
     return (
       <View>
         <View style={styles.row}>
