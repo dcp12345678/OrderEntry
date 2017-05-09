@@ -228,7 +228,7 @@ class RecentOrders extends Component {
           <View style={styles.row}>
             <View style={[styles.info, { backgroundColor: '#5282aa', borderRadius: 9, }]}>
               <View style={{ flexDirection: 'row' }}>
-                <Text style={styles.orderDetail}>Order: {record.id}</Text>
+                <Text style={[styles.orderDetail, { fontWeight: 'bold', fontSize: 20 }]}>Order: {record.id}</Text>
                 <Text style={{ marginLeft: 5, color: 'white', alignSelf: 'center' }}>({record.lineItems.length} items)</Text>
               </View>
               <Text style={styles.date}>Last Update: {Helper.formatDate(record.updateDate)}</Text>
