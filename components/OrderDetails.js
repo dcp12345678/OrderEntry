@@ -260,7 +260,7 @@ class OrderDetails extends Component {
                   borderRadius: 20,
                 }}
                 underlayColor='#578dba' onPress={this.deleteOnPress}>
-                <IoniconsIcon name='ios-trash-outline' color='white' size={30} style={{ alignSelf: 'center', marginLeft: 8, marginTop: 5, marginBottom: 5, marginRight: 5 }} />
+                <IoniconsIcon name='ios-trash-outline' color='white' size={30} style={{ alignSelf: 'center', marginLeft: 10, marginTop: 5, marginBottom: 0, marginRight: 5 }} />
               </TouchableHighlight>
             }
           </View>
