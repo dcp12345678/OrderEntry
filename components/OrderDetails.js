@@ -197,8 +197,8 @@ class OrderDetails extends Component {
             <Text style={{ fontSize: 23, color: 'darkblue', fontWeight: 'bold' }}>{record.productName}</Text>
             <View style={{ flex: 1 }}>
               <View style={{ flex: 1, flexDirection: 'row' }}>
-                <Text style={{ flex: .4, color: 'darkblue', fontSize: 13 }}>Color: {record.colorName}</Text>
-                <Text style={{ flex: .6, color: 'darkblue', fontSize: 13 }}>Item Type: {record.productTypeName}</Text>
+                <Text style={{ flex: .5, color: 'darkblue', fontSize: 13 }}>Color: {record.colorName}</Text>
+                <Text style={{ flex: .5, color: 'darkblue', fontSize: 13 }}>Type: {record.productTypeName}</Text>
               </View>
               <View style={{ flex: 1, flexDirection: 'row' }}>
                 <Text style={{ color: 'darkblue' }}>Line Item Id: {record.id}</Text>
