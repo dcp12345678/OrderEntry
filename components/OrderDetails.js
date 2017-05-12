@@ -121,16 +121,21 @@ class OrderDetails extends Component {
         i.isSelected = false;
       });
 
-      let ds = new ListView.DataSource({
-        rowHasChanged: (r1, r2) => r1 !== r2
-      });
-      this.setState({
-        dataSource: ds.cloneWithRows(orderLineItems),
-        orderLineItems
-      });
+      this.updateLineItemState(this, orderLineItems);
 
     }).catch((err) => {
-      Alert.alert(`error getting order details, ${JSON.stringify(err)}`);
+      Alert.alert('error getting order details!', `${JSON.stringify(err) || '-- could not get order details'}`);
+    });
+  }
+
+  updateLineItemState = (self, newOrderLineItems) => {
+    let ds = new ListView.DataSource({
+      rowHasChanged: (r1, r2) => r1 !== r2
+    });
+
+    self.setState({
+      dataSource: ds.cloneWithRows(newOrderLineItems),
+      orderLineItems: newOrderLineItems
     });
   }
 
@@ -144,15 +149,7 @@ class OrderDetails extends Component {
       }
     });
 
-    let ds = new ListView.DataSource({
-      rowHasChanged: (r1, r2) => r1 !== r2
-    });
-
-    this.setState({
-      dataSource: ds.cloneWithRows(newOrderLineItems),
-      orderLineItems: newOrderLineItems
-    });
-
+    this.updateLineItemState(this, newOrderLineItems);
   }
 
   constructor(props) {
@@ -219,7 +216,31 @@ class OrderDetails extends Component {
   }
 
   deleteOnPress = () => {
-    Alert.alert('delete clicked!');
+    const self = this;
+    co(function* () {
+      // fetch the order from persistence to make sure we have latest version
+      let res = yield ordersApi.getOrder(self.props.orderId);
+      const order = JSON.parse(res.text);
+
+      // create a newLineItems array which will contain all the line items which the user did *not* select
+      // to delete (e.g. it will contain the line items we are keeping)
+      let newLineItems = [];
+      _.forEach(order.lineItems, (lineItem) => {
+        let foundRec = _.find(self.state.orderLineItems, (i) => {
+          // if isSelected is true, it means this is a line item which is to be deleted,
+          // so we *don't* want to include it in newLineItems
+          return i.id === lineItem.id && !i.isSelected;
+        });
+        if (!_.isUndefined(foundRec)) {
+          newLineItems.push(lineItem);
+        }
+      });
+
+      // apply line item deletions to persistence
+      order.lineItems = newLineItems;
+      yield ordersApi.saveOrder(order);
+      self.updateLineItemState(self, order.lineItems);
+    });
   }
 
   render() {

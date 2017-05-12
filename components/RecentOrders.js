@@ -115,7 +115,7 @@ class RecentOrders extends Component {
       });
     }).catch((err) => {
       debugger;
-      Alert.alert(`error getting orders, ${JSON.stringify(err)}`);
+      Alert.alert('error getting orders!', `${JSON.stringify(err) || '-- could not get orders'}`);
     });
   }
 
