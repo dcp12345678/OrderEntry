@@ -17,6 +17,7 @@ import co from 'co';
 import Promise from 'bluebird';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
+import IoniconsIcon from 'react-native-vector-icons/Ionicons';
 import Config from '../config';
 
 const styles = StyleSheet.create({
@@ -116,17 +117,39 @@ class OrderDetails extends Component {
   getOrderDetails = () => {
     ordersApi.getOrderLineItems(this.props.orderId).then((res) => {
       const orderLineItems = JSON.parse(res.text);
+      _.forEach(orderLineItems, (i) => {
+        i.isSelected = false;
+      });
 
-      let ds = new ListView.DataSource({
-        rowHasChanged: (r1, r2) => r1 !== r2
-      });
-      this.setState({
-        dataSource: ds.cloneWithRows(orderLineItems),
-      });
+      this.updateLineItemState(this, orderLineItems);
 
     }).catch((err) => {
-      Alert.alert(`error getting order details, ${JSON.stringify(err)}`);
+      Alert.alert('error getting order details!', `${JSON.stringify(err) || '-- could not get order details'}`);
     });
+  }
+
+  updateLineItemState = (self, newOrderLineItems) => {
+    let ds = new ListView.DataSource({
+      rowHasChanged: (r1, r2) => r1 !== r2
+    });
+
+    self.setState({
+      dataSource: ds.cloneWithRows(newOrderLineItems),
+      orderLineItems: newOrderLineItems
+    });
+  }
+
+  toggleSelectedItem = (id) => {
+    // update the data source, flipping the selected state for the line item matching passed in id
+    let newOrderLineItems = _.cloneDeep(this.state.orderLineItems);
+
+    _.forEach(newOrderLineItems, (lineItem) => {
+      if (lineItem.id === id) {
+        lineItem.isSelected = !lineItem.isSelected;
+      }
+    });
+
+    this.updateLineItemState(this, newOrderLineItems);
   }
 
   constructor(props) {
@@ -135,12 +158,31 @@ class OrderDetails extends Component {
   }
 
   renderRow = (record) => {
+    let numSelectedItems =
+      _.filter(this.state.orderLineItems, (i) => { if (i.isSelected) return i; }).length;
+
+    // If no items are selected, then we don't show the "selected icon" in the first row, but
+    // if at least one item is selected, we will show the icon for each row.  The icon will be an empty
+    // circle if the item is not selected, or a solid circle if it is selected.
+    let firstColumn;
+    if (numSelectedItems === 0) {
+      firstColumn = <View></View>;
+    } else {
+      firstColumn = (
+        <FontAwesomeIcon name={record.isSelected ? 'circle' : 'circle-o'} color='steelblue' size={20}
+          style={{ alignSelf: 'center', marginLeft: 5, marginTop: 5, marginBottom: 5, marginRight: 7 }} />
+      );
+    }
     // set up image URL for product (e.g. product image could be a picture of a Ford F150 truck, for example)
     let src = Config.restApi.baseUrl + record.productImageUri;
-    let iconImage = <Image resizeMode='contain' source={{uri: src}} style={styles.icon} />;
+    let iconImage = <Image resizeMode='contain' source={{ uri: src }} style={styles.icon} />;
     return (
-      <View>
+      <TouchableHighlight
+        underlayColor='transparent'
+        onPress={() => { this.toggleSelectedItem(record.id); }}
+      >
         <View style={styles.row}>
+          {firstColumn}
           <View style={{ backgroundColor: 'white' }}>
             {iconImage}
           </View>
@@ -152,8 +194,8 @@ class OrderDetails extends Component {
             <Text style={{ fontSize: 23, color: 'darkblue', fontWeight: 'bold' }}>{record.productName}</Text>
             <View style={{ flex: 1 }}>
               <View style={{ flex: 1, flexDirection: 'row' }}>
-                <Text style={{ flex: .4, color: 'darkblue', fontSize: 13 }}>Color: {record.colorName}</Text>
-                <Text style={{ flex: .6, color: 'darkblue', fontSize: 13 }}>Item Type: {record.productTypeName}</Text>
+                <Text style={{ flex: .5, color: 'darkblue', fontSize: 13 }}>Color: {record.colorName}</Text>
+                <Text style={{ flex: .5, color: 'darkblue', fontSize: 13 }}>Type: {record.productTypeName}</Text>
               </View>
               <View style={{ flex: 1, flexDirection: 'row' }}>
                 <Text style={{ color: 'darkblue' }}>Line Item Id: {record.id}</Text>
@@ -161,7 +203,7 @@ class OrderDetails extends Component {
             </View>
           </View>
         </View>
-      </View>
+      </TouchableHighlight>
     );
   }
 
@@ -173,6 +215,34 @@ class OrderDetails extends Component {
 
   }
 
+  deleteOnPress = () => {
+    const self = this;
+    co(function* () {
+      // fetch the order from persistence to make sure we have latest version
+      let res = yield ordersApi.getOrder(self.props.orderId);
+      const order = JSON.parse(res.text);
+
+      // create a newLineItems array which will contain all the line items which the user did *not* select
+      // to delete (e.g. it will contain the line items we are keeping)
+      let newLineItems = [];
+      _.forEach(order.lineItems, (lineItem) => {
+        let foundRec = _.find(self.state.orderLineItems, (i) => {
+          // if isSelected is true, it means this is a line item which is to be deleted,
+          // so we *don't* want to include it in newLineItems
+          return i.id === lineItem.id && !i.isSelected;
+        });
+        if (!_.isUndefined(foundRec)) {
+          newLineItems.push(lineItem);
+        }
+      });
+
+      // apply line item deletions to persistence
+      order.lineItems = newLineItems;
+      yield ordersApi.saveOrder(order);
+      self.updateLineItemState(self, order.lineItems);
+    });
+  }
+
   render() {
     if (_.isUndefined(this.state.dataSource)) {
       return (
@@ -181,20 +251,40 @@ class OrderDetails extends Component {
         </View>
       );
     }
+
+    let numSelectedItems =
+      _.filter(this.state.orderLineItems, (i) => { if (i.isSelected) return i; }).length;
+
     return (
       <View style={{ flex: 1, flexDirection: 'column' }}>
         <View style={{
           flexDirection: 'row', justifyContent: 'space-between', alignSelf: 'stretch', backgroundColor: 'steelblue',
           marginBottom: 5,
         }}>
-          <TouchableHighlight
+          <View
             style={{
               marginTop: (Platform.OS === 'ios') ? 25 : 5,
-              borderRadius: 20,
+              flexDirection: 'row'
             }}
-            underlayColor='#578dba' onPress={this.goBackOnPress}>
-            <FontAwesomeIcon name='arrow-circle-left' color='white' size={30} style={{ alignSelf: 'center', marginLeft: 5, marginTop: 5, marginBottom: 5, marginRight: 5 }} />
-          </TouchableHighlight>
+          >
+            <TouchableHighlight
+              style={{
+                borderRadius: 20,
+              }}
+              underlayColor='#578dba' onPress={this.goBackOnPress}>
+              <FontAwesomeIcon name='arrow-circle-left' color='white' size={30} style={{ alignSelf: 'center', marginLeft: 5, marginTop: 5, marginBottom: 5, marginRight: 5 }} />
+            </TouchableHighlight>
+            { /* only show the trashcan icon (used to delete items) if at least one item has been selected */}
+            {numSelectedItems > 0 &&
+              <TouchableHighlight
+                style={{
+                  borderRadius: 20,
+                }}
+                underlayColor='#578dba' onPress={this.deleteOnPress}>
+                <IoniconsIcon name='ios-trash-outline' color='white' size={30} style={{ alignSelf: 'center', marginLeft: 10, marginTop: 5, marginBottom: 0, marginRight: 5 }} />
+              </TouchableHighlight>
+            }
+          </View>
           <Text style={[
             {
               color: 'darkblue',
@@ -207,16 +297,22 @@ class OrderDetails extends Component {
             }]}>
             Order Details ({this.props.orderId})
           </Text>
-          <TouchableHighlight
+          <View
             style={{
               marginTop: (Platform.OS === 'ios') ? 25 : 5,
-              borderRadius: 20,
+              flexDirection: 'row'
             }}
-            underlayColor='#578dba' onPress={this.addLineItem}>
-            <View style={{ marginRight: 8, flexDirection: 'row', justifyContent: 'center' }}>
-              <MaterialIcon name='add-circle-outline' color='white' size={30} style={{ alignSelf: 'center', marginLeft: 5, marginTop: 5, marginBottom: 5, marginRight: 5 }} />
-            </View>
-          </TouchableHighlight>
+          >
+            <TouchableHighlight
+              style={{
+                borderRadius: 20,
+              }}
+              underlayColor='#578dba' onPress={this.addLineItem}>
+              <View style={{ marginRight: 8, flexDirection: 'row', justifyContent: 'center' }}>
+                <MaterialIcon name='add-circle-outline' color='white' size={30} style={{ alignSelf: 'center', marginLeft: 5, marginTop: 5, marginBottom: 5 }} />
+              </View>
+            </TouchableHighlight>
+          </View>
         </View>
         <ListView
           dataSource={this.state.dataSource}
