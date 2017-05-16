@@ -58,6 +58,21 @@ const styles = StyleSheet.create({
 
 class Login extends Component {
 
+  static navigationOptions = ({ navigation }) => ({
+    title: 'Order Entry System',
+    headerStyle: { backgroundColor: 'steelblue', height: 35 },
+    headerTitleStyle: { alignSelf: 'center', color: 'darkblue', fontSize: 20 },
+    headerLeft: (
+      <TouchableHighlight
+        style={{
+          borderRadius: 20,
+        }}
+        underlayColor='#578dba' onPress={() => { navigation.goBack(); }}>
+        <FontAwesomeIcon name='arrow-circle-left' color='white' size={30} style={{ alignSelf: 'center', marginLeft: 5, marginTop: 5, marginBottom: 5, marginRight: 5 }} />
+      </TouchableHighlight>
+    )
+  });
+
   constructor(props) {
     super(props);
     this.state = { showSpinner: false };
@@ -100,34 +115,7 @@ class Login extends Component {
 
   render() {
     return (
-      <View style={{ flex: 1, flexDirection: 'column' }}>
-        <View style={{
-          flexDirection: 'row', justifyContent: 'space-around', alignSelf: 'stretch', backgroundColor: 'steelblue',
-          marginBottom: 30,
-        }}>
-          <View style={{ flexDirection: 'row' }}>
-            <Text style={[
-              {
-                color: 'darkblue',
-                fontWeight: 'bold',
-                marginBottom: 0,
-                padding: 0,
-                fontSize: 20,
-                marginTop: (Platform.OS === 'ios') ? 25 : 5,
-              }]}>
-              Order Entry System
-            </Text>
-            <FontAwesomeIcon name="book" color='darkblue' size={30}
-              style={
-                {
-                  alignSelf: 'center',
-                  marginLeft: 10,
-                  marginTop: (Platform.OS === 'ios') ? 25 : 5,
-                  marginBottom: 5
-                }
-              } />
-          </View>
-        </View>
+      <View style={{ flex: 1, flexDirection: 'column', marginTop: 30 }}>
         <View style={styles.container}>
           <Spinner visible={this.state.showSpinner} textContent={"Logging In..."} textStyle={{ color: '#FFF' }} />
           <TextInput
