@@ -60,7 +60,7 @@ class Login extends Component {
 
   static navigationOptions = ({ navigation }) => ({
     title: 'Order Entry System',
-    headerStyle: { backgroundColor: 'steelblue', height: 35 },
+    headerStyle: { backgroundColor: 'steelblue' },
     headerTitleStyle: { alignSelf: 'center', color: 'darkblue', fontSize: 20 },
     headerLeft: (
       <TouchableHighlight
