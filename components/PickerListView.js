@@ -20,21 +20,22 @@ class PickerListView extends Component {
 
   constructor(props) {
     super(props);
+    debugger;
     let ds = new ListView.DataSource({
       rowHasChanged: (r1, r2) => r1 !== r2
     });
     this.state = {
-      dataSource: ds.cloneWithRows(this.props.data)
+      dataSource: ds.cloneWithRows(this.props.navigation.state.params.data)
     };
   }
 
   pickItem = (item) => {
-    this.props.onPickedItem(item);
-    this.props.navigator.pop();
+    this.props.navigation.state.params.onPickedItem(item);
+    this.props.navigation.goBack();
   }
 
   cancel = () => {
-    this.props.navigator.pop();
+    this.props.navigation.goBack();
   }
 
   renderRow = (item) => {

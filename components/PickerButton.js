@@ -23,16 +23,14 @@ class PickerButton extends Component {
   }
 
   showPickerListView = () => {
-    this.props.navigator.push({
-      name: 'PickerListView',
-      passProps: {
+    this.props.navigation.navigate('PickerListView',
+      {
         ...this.props
-      }
-    });
-
+      });
   }
 
   render() {
+    debugger;
     let defaultItemText = 'Choose';
 
     if (this.props.selectedItemId !== -1) {

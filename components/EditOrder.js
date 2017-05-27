@@ -14,11 +14,9 @@ import _ from 'lodash';
 import Helper from '../helpers/Helper';
 import co from 'co';
 import Promise from 'bluebird';
-
-const basketIcon = require('../images/basket.png');
-const carIcon = require('../images/car.png');
-const truckIcon = require('../images/truck.png');
-const motorcycleIcon = require('../images/motorcycle.png');
+import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
+import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
+import LinearGradient from 'react-native-linear-gradient';
 
 const styles = StyleSheet.create({
   mainHeader: {
@@ -56,10 +54,42 @@ const ordersApi = new OrdersApi();
 
 class EditOrder extends Component {
 
+  static navigationOptions = ({ navigation }) => ({
+    title: navigation.state.params.orderId === -1 ? "New Order" : ("Edit Order " + navigation.state.params.orderId),
+    headerStyle: { backgroundColor: 'steelblue' },
+    headerTitleStyle: { color: 'darkblue', fontSize: 20, },
+    headerLeft: (
+      <View style={{ flexDirection: 'row' }}>
+        <TouchableHighlight
+          style={{
+            borderRadius: 20,
+          }}
+          underlayColor='#578dba' onPress={() => { navigation.goBack(); }}>
+          <FontAwesomeIcon name='arrow-circle-left' color='white' size={30} style={{ alignSelf: 'center', marginLeft: 5, marginTop: 5, marginBottom: 5, marginRight: 5 }} />
+        </TouchableHighlight>
+      </View>
+    ),
+    headerRight: (
+      <View style={{ flexDirection: 'row' }}>
+        <TouchableHighlight
+          style={{
+            borderRadius: 20,
+          }}
+          underlayColor='#578dba' onPress={() => { EditOrder.addItem(); }}>
+          <MaterialIcon name='add-circle-outline' color='white' size={30} style={{ alignSelf: 'center', marginLeft: 5, marginTop: 5, marginBottom: 5, marginRight: 5 }} />
+        </TouchableHighlight>
+      </View>
+    ),
+  });
+
+  static instance = undefined;
+
   constructor(props) {
+    debugger;
     super(props);
+    EditOrder.instance = this;
     let order = {};
-    if (this.props.orderId === -1) {
+    if (this.props.navigation.state.params.orderId === -1) {
       order.id = -1;
       order.lineItems = [];
     } else {
@@ -68,16 +98,27 @@ class EditOrder extends Component {
     this.state = { dataSource: undefined, order };
   }
 
-  addItem = () => {
-    this.props.navigator.push({
-      name: 'EditOrderLineItem',
-      passProps: {
-        userId: this.props.userId,
-        orderId: this.state.order.id,
+  static addItem = () => {
+    let self = EditOrder.instance;
+    const navigation = self.props.navigation;
+    Alert.alert('test', `inside addItem, self.state.order.id = ${self.state.order.id}`);
+    navigation.navigate('EditOrderLineItem',
+      {
+        userId: navigation.state.params.userId,
+        orderId: self.state.order.id,
         orderLineItemId: -1,
-        addLineItemToOrder: (lineItem) => { this.state.order.lineItems.push(lineItem); },
-      }
-    });
+        addLineItemToOrder: (lineItem) => { self.state.order.lineItems.push(lineItem); }
+      });
+
+    // navigation.navigate.push({
+    //   name: 'EditOrderLineItem',
+    //   passProps: {
+    //     userId: this.props.userId,
+    //     orderId: this.state.order.id,
+    //     orderLineItemId: -1,
+    //     addLineItemToOrder: (lineItem) => { this.state.order.lineItems.push(lineItem); },
+    //   }
+    // });
   }
 
   deleteItems = () => {

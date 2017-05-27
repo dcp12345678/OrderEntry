@@ -79,6 +79,56 @@ const styles = StyleSheet.create({
 
 class RecentOrders extends Component {
 
+  static navigationOptions = ({ navigation }) => ({
+    title: 'Recent Orders',
+    headerStyle: { backgroundColor: 'steelblue' },
+    headerTitleStyle: { color: 'darkblue', fontSize: 20, },
+    headerLeft: (
+      <View style={{ flexDirection: 'row' }}>
+        <TouchableHighlight
+          style={{
+            borderRadius: 20,
+          }}
+          underlayColor='#578dba' onPress={() => { navigation.goBack(); }}>
+          <FontAwesomeIcon name='arrow-circle-left' color='white' size={30} style={{ alignSelf: 'center', marginLeft: 5, marginTop: 5, marginBottom: 5, marginRight: 5 }} />
+        </TouchableHighlight>
+      </View>
+    ),
+    headerRight: (
+      <View style={{ flexDirection: 'row' }}>
+        <TouchableHighlight
+          style={{
+            borderRadius: 20,
+          }}
+          underlayColor='#578dba' onPress={() => { RecentOrders.newOrderOnPress(navigation); }}>
+          <MaterialIcon name='add-circle-outline' color='white' size={30} style={{ alignSelf: 'center', marginLeft: 5, marginTop: 5, marginBottom: 5, marginRight: 5 }} />
+        </TouchableHighlight>
+        <TouchableHighlight
+          style={{
+            borderRadius: 20,
+            marginLeft: 5,
+          }}
+          underlayColor='#578dba' onPress={() => { RecentOrders.searchOrdersOnPress(); }}>
+          <View style={{ marginRight: 8, flexDirection: 'row', justifyContent: 'center' }}>
+            <MaterialIcon name='search' color='white' size={30} style={{ alignSelf: 'center', marginLeft: 5, marginTop: 5, marginBottom: 5, marginRight: 5 }} />
+          </View>
+        </TouchableHighlight>
+      </View>
+    ),
+  });
+
+  static newOrderOnPress = (navigation) => {
+    navigation.navigate('EditOrder',
+      {
+        userId: navigation.state.params.userId,
+        orderId: -1
+      });
+  }
+
+  static searchOrdersOnPress = () => {
+    Alert.alert('inside searchOrdersOnPress');
+  }
+
   componentDidMount() {
     this.getOrders();
   }
@@ -86,7 +136,7 @@ class RecentOrders extends Component {
   getOrders = () => {
     let self = this;
     co(function* () {
-      let res = yield ordersApi.getOrdersForUser(self.props.userId);
+      let res = yield ordersApi.getOrdersForUser(self.props.navigation.state.params.userId);
       let orders = JSON.parse(res.text);
 
       for (let i = 0; i < orders.length; ++i) {
@@ -141,32 +191,17 @@ class RecentOrders extends Component {
   }
 
   viewOrderDetailsOnPress = (orderId) => {
-    this.props.navigator.push({
-      name: 'OrderDetails',
-      passProps: {
+    debugger;
+    this.props.navigation.navigate('OrderDetails',
+      {
         orderId: orderId,
-        userId: this.props.userId,
-      }
-    });
+        userId: this.props.navigation.state.params.userId,
+      });
   }
 
   constructor(props) {
     super(props);
     this.state = { dataSource: undefined };
-  }
-
-  newOrderOnPress = () => {
-    this.props.navigator.push({
-      name: 'EditOrder',
-      passProps: {
-        userId: this.props.userId,
-        orderId: -1
-      }
-    });
-  }
-
-  searchOrdersOnPress = () => {
-    Alert.alert('need to implement');
   }
 
   renderRow = (record) => {
@@ -244,46 +279,13 @@ class RecentOrders extends Component {
     if (_.isUndefined(this.state.dataSource)) {
       return <View></View>;
     }
+    // test comment
     return (
-      <View style={{ flex: 1, flexDirection: 'column' }}>
-        <View style={{
-          flexDirection: 'row', justifyContent: 'space-between', alignSelf: 'stretch', backgroundColor: 'steelblue',
-          marginBottom: 5,
-        }}>
-          <TouchableHighlight
-            style={{
-              marginTop: (Platform.OS === 'ios') ? 25 : 5,
-              borderRadius: 20,
-            }}
-            underlayColor='#578dba' onPress={this.newOrderOnPress}>
-            <MaterialIcon name='add-circle-outline' color='white' size={30} style={{ alignSelf: 'center', marginLeft: 5, marginTop: 5, marginBottom: 5, marginRight: 5 }} />
-          </TouchableHighlight>
-          <Text style={[
-            {
-              color: 'darkblue',
-              fontWeight: 'bold',
-              marginBottom: 0,
-              padding: 0,
-              fontSize: 20,
-              alignSelf: 'center',
-              marginTop: (Platform.OS === 'ios') ? 25 : 5,
-            }]}>
-            Recent Orders
-            </Text>
-          <TouchableHighlight
-            style={{
-              marginTop: (Platform.OS === 'ios') ? 25 : 5,
-              borderRadius: 20,
-            }}
-            underlayColor='#578dba' onPress={this.searchOrdersOnPress}>
-            <View style={{ marginRight: 8, flexDirection: 'row', justifyContent: 'center' }}>
-              <MaterialIcon name='search' color='white' size={30} style={{ alignSelf: 'center', marginLeft: 5, marginTop: 5, marginBottom: 5, marginRight: 5 }} />
-            </View>
-          </TouchableHighlight>
-        </View>
+      <View style={{ flex: 1, flexDirection: 'column', backgroundColor: 'lightsteelblue' }}>
         <ListView
           dataSource={this.state.dataSource}
           renderRow={this.renderRow}
+          style={{ marginTop: 10, }}
         />
       </View>
     );

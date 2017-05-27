@@ -10,9 +10,8 @@
     "bluebird": "^3.5.0",
     "co": "^4.6.0",
     "moment": "^2.18.1",
-    "react": "^16.0.0-alpha.6",
+    "react": "16.0.0-alpha.6",
     "react-native": "^0.44.0",
-    "react-native-deprecated-custom-components": "^0.1.0",
     "react-native-linear-gradient": "^2.0.0",
     "react-native-loading-spinner-overlay": "^0.4.2",
     "react-native-vector-icons": "^4.0.1",
@@ -20,10 +19,10 @@
     "superagent": "^3.5.2"
   },
   "devDependencies": {
-    "babel-jest": "19.0.0",
-    "babel-preset-react-native": "1.9.1",
-    "jest": "19.0.2",
-    "react-test-renderer": "15.4.2"
+    "babel-jest": "20.0.3",
+    "babel-preset-react-native": "1.9.2",
+    "jest": "20.0.3",
+    "react-test-renderer": "16.0.0-alpha.6"
   },
   "jest": {
     "preset": "react-native"

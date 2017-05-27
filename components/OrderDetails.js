@@ -110,12 +110,91 @@ const ordersApi = new OrdersApi();
 
 class OrderDetails extends Component {
 
+  static navigationOptions = ({ navigation }) => ({
+    title: `Order Details (${navigation.state.params.orderId})`,
+    headerStyle: { backgroundColor: 'steelblue' },
+    headerTitleStyle: { color: 'darkblue', fontSize: 20, },
+    headerLeft: (
+      <View style={{ flexDirection: 'row' }}>
+        <TouchableHighlight
+          style={{
+            borderRadius: 20,
+          }}
+          underlayColor='#578dba' onPress={() => { navigation.goBack(); }}>
+          <FontAwesomeIcon name='arrow-circle-left' color='white' size={30} style={{ alignSelf: 'center', marginLeft: 5, marginTop: 5, marginBottom: 5, marginRight: 5 }} />
+        </TouchableHighlight>
+      </View>
+    ),
+    headerRight: (
+      <View style={{ flexDirection: 'row' }}>
+        <TouchableHighlight
+          style={{
+            borderRadius: 20,
+          }}
+          underlayColor='#578dba' onPress={() => { OrderDetails.addLineItemOnPress(); }}>
+          <MaterialIcon name='add-circle-outline' color='white' size={30} style={{ alignSelf: 'center', marginLeft: 5, marginTop: 5, marginBottom: 5, marginRight: 5 }} />
+        </TouchableHighlight>
+        { /* only show the trashcan icon (used to delete line items) if at least one item has been selected */}
+        {navigation.state.params.isItemSelected &&
+          <TouchableHighlight
+            style={{
+              borderRadius: 20,
+            }}
+            underlayColor='#578dba' onPress={() => { OrderDetails.deleteLineItemsOnPress(); }}>
+            <IoniconsIcon name='ios-trash-outline' color='white' size={30} style={{ alignSelf: 'center', marginLeft: 10, marginTop: 5, marginBottom: 0, marginRight: 5 }} />
+          </TouchableHighlight>
+        }
+      </View>
+    ),
+  });
+
+  static instance = undefined;
+
+  constructor(props) {
+    super(props);
+    OrderDetails.instance = this;
+    this.state = { dataSource: undefined };
+  }
+
   componentDidMount() {
+    this.props.navigation.setParams({ isItemSelected: false });
     this.getOrderDetails();
   }
 
+  static deleteLineItemsOnPress = () => {
+    const self = OrderDetails.instance;
+    co(function* () {
+      // fetch the order from persistence to make sure we have latest version
+      let res = yield ordersApi.getOrder(self.props.orderId);
+      const order = JSON.parse(res.text);
+
+      // create a newLineItems array which will contain all the line items which the user did *not* select
+      // to delete (e.g. it will contain the line items we are keeping)
+      let newLineItems = [];
+      _.forEach(order.lineItems, (lineItem) => {
+        let foundRec = _.find(self.state.orderLineItems, (i) => {
+          // if isSelected is true, it means this is a line item which is to be deleted,
+          // so we *don't* want to include it in newLineItems
+          return i.id === lineItem.id && !i.isSelected;
+        });
+        if (!_.isUndefined(foundRec)) {
+          newLineItems.push(lineItem);
+        }
+      });
+
+      // apply line item deletions to persistence
+      order.lineItems = newLineItems;
+      yield ordersApi.saveOrder(order);
+      self.updateLineItemState(self, order.lineItems);
+    });
+  }
+
+  static addLineItemOnPress = () => {
+    const self = OrderDetails.instance;
+  }
+
   getOrderDetails = () => {
-    ordersApi.getOrderLineItems(this.props.orderId).then((res) => {
+    ordersApi.getOrderLineItems(this.props.navigation.state.params.orderId).then((res) => {
       const orderLineItems = JSON.parse(res.text);
       _.forEach(orderLineItems, (i) => {
         i.isSelected = false;
@@ -137,6 +216,10 @@ class OrderDetails extends Component {
       dataSource: ds.cloneWithRows(newOrderLineItems),
       orderLineItems: newOrderLineItems
     });
+
+    let numSelectedLineItems =
+      _.filter(newOrderLineItems, (i) => { if (i.isSelected) return i; }).length;
+    self.props.navigation.setParams({ isItemSelected: numSelectedLineItems > 0 });
   }
 
   toggleSelectedItem = (id) => {
@@ -150,11 +233,6 @@ class OrderDetails extends Component {
     });
 
     this.updateLineItemState(this, newOrderLineItems);
-  }
-
-  constructor(props) {
-    super(props);
-    this.state = { dataSource: undefined };
   }
 
   renderRow = (record) => {
@@ -211,10 +289,6 @@ class OrderDetails extends Component {
     this.props.navigator.pop();
   }
 
-  addLineItem = () => {
-
-  }
-
   deleteOnPress = () => {
     const self = this;
     co(function* () {
@@ -257,63 +331,6 @@ class OrderDetails extends Component {
 
     return (
       <View style={{ flex: 1, flexDirection: 'column' }}>
-        <View style={{
-          flexDirection: 'row', justifyContent: 'space-between', alignSelf: 'stretch', backgroundColor: 'steelblue',
-          marginBottom: 5,
-        }}>
-          <View
-            style={{
-              marginTop: (Platform.OS === 'ios') ? 25 : 5,
-              flexDirection: 'row'
-            }}
-          >
-            <TouchableHighlight
-              style={{
-                borderRadius: 20,
-              }}
-              underlayColor='#578dba' onPress={this.goBackOnPress}>
-              <FontAwesomeIcon name='arrow-circle-left' color='white' size={30} style={{ alignSelf: 'center', marginLeft: 5, marginTop: 5, marginBottom: 5, marginRight: 5 }} />
-            </TouchableHighlight>
-            { /* only show the trashcan icon (used to delete items) if at least one item has been selected */}
-            {numSelectedItems > 0 &&
-              <TouchableHighlight
-                style={{
-                  borderRadius: 20,
-                }}
-                underlayColor='#578dba' onPress={this.deleteOnPress}>
-                <IoniconsIcon name='ios-trash-outline' color='white' size={30} style={{ alignSelf: 'center', marginLeft: 10, marginTop: 5, marginBottom: 0, marginRight: 5 }} />
-              </TouchableHighlight>
-            }
-          </View>
-          <Text style={[
-            {
-              color: 'darkblue',
-              fontWeight: 'bold',
-              marginBottom: 0,
-              padding: 0,
-              fontSize: 20,
-              alignSelf: 'center',
-              marginTop: (Platform.OS === 'ios') ? 25 : 5,
-            }]}>
-            Order Details ({this.props.orderId})
-          </Text>
-          <View
-            style={{
-              marginTop: (Platform.OS === 'ios') ? 25 : 5,
-              flexDirection: 'row'
-            }}
-          >
-            <TouchableHighlight
-              style={{
-                borderRadius: 20,
-              }}
-              underlayColor='#578dba' onPress={this.addLineItem}>
-              <View style={{ marginRight: 8, flexDirection: 'row', justifyContent: 'center' }}>
-                <MaterialIcon name='add-circle-outline' color='white' size={30} style={{ alignSelf: 'center', marginLeft: 5, marginTop: 5, marginBottom: 5 }} />
-              </View>
-            </TouchableHighlight>
-          </View>
-        </View>
         <ListView
           dataSource={this.state.dataSource}
           renderRow={this.renderRow}

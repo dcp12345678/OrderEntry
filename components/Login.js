@@ -62,15 +62,6 @@ class Login extends Component {
     title: 'Order Entry System',
     headerStyle: { backgroundColor: 'steelblue' },
     headerTitleStyle: { color: 'darkblue', fontSize: 20 },
-    headerLeft: (
-      <TouchableHighlight
-        style={{
-          borderRadius: 20,
-        }}
-        underlayColor='#578dba' onPress={() => { navigation.goBack(); }}>
-        <FontAwesomeIcon name='arrow-circle-left' color='white' size={30} style={{ alignSelf: 'center', marginLeft: 5, marginTop: 5, marginBottom: 5, marginRight: 5 }} />
-      </TouchableHighlight>
-    )
   });
 
   constructor(props) {
@@ -86,36 +77,25 @@ class Login extends Component {
       // this.props.auth.setToken(authResult.accessToken);
       if (obj.result === 'successful login') {
         //Alert.alert('login successful');
-        this.props.navigator.push({
-          name: 'MainForm',
-          passProps: {
-            prop1: 'the first property***',
-            prop2: 42,
+        this.props.navigation.navigate('RecentOrders',
+          {
             userId: obj.userId,
-          }
-        });
-        //Helper.setSessionStorageObject('userDetails', {userId: obj.userId, sessionId: obj.sessionId});
-        //hashHistory.push('/main');
+          });
       } else {
-        debugger;
         this.setState({ showSpinner: false });
-        setTimeout(() => {
-          Alert.alert('login failed!', `${obj.result || '--- could not login'}`);
-        }, 100)
+        Alert.alert('login failed!', `${obj.result || '--- could not login'}`);
         //hashHistory.push('/login');
       }
     }).catch((err) => {
       debugger;
       this.setState({ showSpinner: false });
-      setTimeout(() => {
-        Alert.alert('login failed!', `${JSON.stringify(err) || '-- could not login'}`);
-      }, 100)
+      Alert.alert('login failed!', `${JSON.stringify(err) || '-- could not login'}`);
     });
   }
 
   render() {
     return (
-      <View style={{ flex: 1, flexDirection: 'column', marginTop: 30 }}>
+      <View style={{ flex: 1, flexDirection: 'column', backgroundColor: 'lightsteelblue', paddingTop: 30 }}>
         <View style={styles.container}>
           <Spinner visible={this.state.showSpinner} textContent={"Logging In..."} textStyle={{ color: '#FFF' }} />
           <TextInput

@@ -20,6 +20,9 @@ import _ from 'lodash';
 import Helper from '../helpers/Helper';
 import co from 'co';
 import Promise from 'bluebird';
+import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
+import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
+import LinearGradient from 'react-native-linear-gradient';
 
 const basketIcon = require('../images/basket.png');
 const carIcon = require('../images/car.png');
@@ -61,13 +64,44 @@ const ordersApi = new OrdersApi();
 const lookupApi = new LookupApi();
 
 class EditOrderLineItem extends Component {
+  static navigationOptions = ({ navigation }) => ({
+    title: navigation.state.params.orderLineItemId === -1 ? "New Order Item" :
+      ("Edit Order Item " + navigation.state.params.orderLineItemId),
+    headerStyle: { backgroundColor: 'steelblue' },
+    headerTitleStyle: { color: 'darkblue', fontSize: 20, },
+    headerLeft: (
+      <View style={{ flexDirection: 'row' }}>
+        <TouchableHighlight
+          style={{
+            borderRadius: 20,
+          }}
+          underlayColor='#578dba' onPress={() => { navigation.goBack(); }}>
+          <FontAwesomeIcon name='arrow-circle-left' color='white' size={30} style={{ alignSelf: 'center', marginLeft: 5, marginTop: 5, marginBottom: 5, marginRight: 5 }} />
+        </TouchableHighlight>
+      </View>
+    ),
+    headerRight: (
+      <View style={{ flexDirection: 'row' }}>
+        <TouchableHighlight
+          style={{
+            borderRadius: 20,
+          }}
+          underlayColor='#578dba' onPress={() => { }}>
+          <MaterialIcon name='add-circle-outline' color='white' size={30} style={{ alignSelf: 'center', marginLeft: 5, marginTop: 5, marginBottom: 5, marginRight: 5 }} />
+        </TouchableHighlight>
+      </View>
+    ),
+  });
+
+  static instance = undefined;
 
   constructor(props) {
     super(props);
+    EditOrderLineItem.instance = this;
     this.state = {
       isLoaded: false,
       disableSave: true,
-      isNew: this.props.orderLineItemId === -1
+      isNew: this.props.navigation.state.params.orderLineItemId === -1
     };
 
     const self = this;
@@ -158,14 +192,8 @@ class EditOrderLineItem extends Component {
 
     //Alert.alert(`lineItem = ${JSON.stringify(this.state.lineItem)}`);
 
-    let header = this.props.orderLineItemId === -1 ? "New Order Item" :
-      ("Edit Order Item " + this.props.orderLineItemId);
-
     return (
       <View style={styles.mainContainer}>
-        <View style={styles.mainHeader}>
-          <Text style={styles.headerText}>{header}</Text>
-        </View>
         <View style={{ alignItems: 'center' }}>
           <View style={styles.buttonContainer}>
             <View style={{ width: 90 }}>
@@ -192,7 +220,7 @@ class EditOrderLineItem extends Component {
             data={this.state.productTypes}
             itemName="Product Type"
             selectedItemId={this.state.lineItem.productTypeId}
-            navigator={this.props.navigator}
+            navigation={this.props.navigation}
             onPickedItem={this.pickProductType} />
         </View>
         {/* only show product and color picker buttons if a product type has been selected */}
@@ -205,7 +233,7 @@ class EditOrderLineItem extends Component {
                   data={this.state.products}
                   itemName="Product"
                   selectedItemId={this.state.lineItem.productId}
-                  navigator={this.props.navigator}
+                  navigation={this.props.navigation}
                   onPickedItem={this.pickProduct} />
               </View>
               <View>
@@ -214,7 +242,7 @@ class EditOrderLineItem extends Component {
                   data={this.state.colors}
                   itemName="Product Color"
                   selectedItemId={this.state.lineItem.colorId}
-                  navigator={this.props.navigator}
+                  navigation={this.props.navigation}
                   onPickedItem={this.pickColor} />
               </View>
             </View>
