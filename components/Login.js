@@ -61,7 +61,7 @@ class Login extends Component {
   static navigationOptions = ({ navigation }) => ({
     title: 'Order Entry System',
     headerStyle: { backgroundColor: 'steelblue' },
-    headerTitleStyle: { color: 'darkblue', fontSize: 20 },
+    headerTitleStyle: { color: 'darkblue', fontSize: Platform.OS === 'ios' ? 18 : 20 },
   });
 
   constructor(props) {

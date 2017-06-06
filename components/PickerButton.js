@@ -55,8 +55,8 @@ class PickerButton extends Component {
                 justifyContent: 'space-between',
               }
             }>
-              <Text style={{ fontSize: 18, color: 'white', margin: 5, }}>{defaultItemText}</Text>
-              <Text style={{ fontWeight: 'bold', fontSize: 18, color: 'white', margin: 5, }}>></Text>
+              <Text style={{ fontSize: 18, color: 'white', backgroundColor: 'transparent', margin: 5, }}>{defaultItemText}</Text>
+              <Text style={{ fontWeight: 'bold', fontSize: 18, color: 'white', backgroundColor: 'transparent', margin: 5, }}>></Text>
             </View>
           </TouchableOpacity>
         </LinearGradient>

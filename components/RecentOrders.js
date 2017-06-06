@@ -82,7 +82,7 @@ class RecentOrders extends Component {
   static navigationOptions = ({ navigation }) => ({
     title: 'Recent Orders',
     headerStyle: { backgroundColor: 'steelblue' },
-    headerTitleStyle: { color: 'darkblue', fontSize: 20, },
+    headerTitleStyle: { color: 'darkblue', fontSize: Platform.OS === 'ios' ? 18 : 20, },
     headerLeft: ( <View></View>
     ),
     headerRight: (

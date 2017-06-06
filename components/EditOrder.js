@@ -45,7 +45,7 @@ class EditOrder extends Component {
   static navigationOptions = ({ navigation }) => ({
     title: `Edit Order (${navigation.state.params.orderId})`,
     headerStyle: { backgroundColor: 'steelblue' },
-    headerTitleStyle: { color: 'darkblue', fontSize: 20, },
+    headerTitleStyle: { color: 'darkblue', fontSize: Platform.OS === 'ios' ? 18 : 20 },
     headerLeft: (
       <View style={{ flexDirection: 'row' }}>
         <TouchableHighlight

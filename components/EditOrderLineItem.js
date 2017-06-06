@@ -12,6 +12,7 @@ import {
   Dimensions,
   TouchableOpacity,
   TextInput,
+  Platform,
 } from 'react-native';
 import PickerButton from './PickerButton';
 import OrdersApi from '../api/OrdersApi';
@@ -64,7 +65,7 @@ class EditOrderLineItem extends Component {
     title: navigation.state.params.orderLineItemId === -1 ? "New Order - Add Item" :
       ("Edit Order Item " + navigation.state.params.orderLineItemId),
     headerStyle: { backgroundColor: 'steelblue' },
-    headerTitleStyle: { color: 'darkblue', fontSize: 20, },
+    headerTitleStyle: { color: 'darkblue', fontSize: Platform.OS === 'ios' ? 18 : 20, },
     headerLeft: (
       <View style={{ flexDirection: 'row' }}>
         <TouchableHighlight
