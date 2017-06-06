@@ -66,6 +66,13 @@ class EditOrder extends Component {
           underlayColor='#578dba' onPress={() => { navigation.state.params.addLineItemOnPress(); }}>
           <MaterialIcon name='add-circle-outline' color='white' size={30} style={{ alignSelf: 'center', marginLeft: 5, marginTop: 5, marginBottom: 5, marginRight: 5 }} />
         </TouchableHighlight>
+        <TouchableHighlight
+          style={{
+            borderRadius: 20,
+          }}
+          underlayColor='#578dba' onPress={() => { navigation.state.params.goHome(); }}>
+          <MaterialIcon name='home' color='white' size={30} style={{ alignSelf: 'center', marginLeft: 5, marginTop: 5, marginBottom: 5, marginRight: 5 }} />
+        </TouchableHighlight>
         { /* only show the trashcan icon (used to delete line items) if at least one item has been selected */}
         {navigation.state.params.isItemSelected &&
           <TouchableHighlight
@@ -91,10 +98,18 @@ class EditOrder extends Component {
       {
         isItemSelected: false,
         deleteLineItemsOnPress: this.deleteLineItemsOnPress,
-        addLineItemOnPress: this.addLineItemOnPress
+        addLineItemOnPress: this.addLineItemOnPress,
+        goHome: this.goHome,
       }
     );
     this.getOrderDetails();
+  }
+
+  goHome = () => {
+    this.props.navigation.navigate('RecentOrders',
+      {
+        userId: this.props.navigation.state.params.userId,
+      });
   }
 
   addLineItemOnPress = () => {
@@ -262,11 +277,7 @@ class EditOrder extends Component {
 
   render() {
     if (_.isUndefined(this.state.dataSource)) {
-      return (
-        <View>
-          <Text>Loading...</Text>
-        </View>
-      );
+      return <View><Text style={{ fontSize: 18 }}>Loading...</Text></View>;
     }
 
     let numSelectedItems =

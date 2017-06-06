@@ -83,7 +83,7 @@ class RecentOrders extends Component {
     title: 'Recent Orders',
     headerStyle: { backgroundColor: 'steelblue' },
     headerTitleStyle: { color: 'darkblue', fontSize: Platform.OS === 'ios' ? 18 : 20, },
-    headerLeft: ( <View></View>
+    headerLeft: (<View></View>
     ),
     headerRight: (
       <View style={{ flexDirection: 'row' }}>
@@ -271,7 +271,7 @@ class RecentOrders extends Component {
 
   render() {
     if (_.isUndefined(this.state.dataSource)) {
-      return <View></View>;
+      return <View><Text style={{ fontSize: 18 }}>Loading...</Text></View>;
     }
     return (
       <View style={{ flex: 1, flexDirection: 'column', backgroundColor: 'lightsteelblue' }}>
