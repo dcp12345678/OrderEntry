@@ -7,7 +7,8 @@ import {
   Text,
   TouchableHighlight,
   Button,
-  Alert
+  Alert,
+  Platform,
 } from 'react-native';
 import OrdersApi from '../api/OrdersApi';
 import _ from 'lodash';
@@ -16,37 +17,24 @@ import co from 'co';
 import Promise from 'bluebird';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
-import LinearGradient from 'react-native-linear-gradient';
+import IoniconsIcon from 'react-native-vector-icons/Ionicons';
+import Config from '../config';
 
 const styles = StyleSheet.create({
-  mainHeader: {
-    backgroundColor: 'lightgoldenrodyellow',
-    borderWidth: 1,
-    borderColor: 'goldenrod',
-    //height: 40,
-    alignItems: 'center',
-    alignSelf: 'stretch',
+  row: {
+    borderColor: '#f1f1f1',
+    borderBottomWidth: 1,
+    flexDirection: 'row',
     marginLeft: 10,
     marginRight: 10,
-    marginTop: 10,
+    paddingTop: 8,
+    paddingBottom: 8
   },
-  mainContainer: {
-    flex: 1,
-    flexDirection: 'column',
-    backgroundColor: '#fff',
-  },
-  buttonContainer: {
-    alignItems: 'center',
-    marginTop: 10,
-    marginBottom: 10,
-    marginLeft: 20,
-    marginRight: 20,
-    justifyContent: 'space-between',
-    flexDirection: 'row',
-  },
-  headerText: {
-    fontSize: 18,
-    color: 'purple'
+  icon: {
+    height: 70,
+    width: 100,
+    borderColor: 'steelblue',
+    borderWidth: 3,
   },
 });
 
@@ -55,7 +43,7 @@ const ordersApi = new OrdersApi();
 class EditOrder extends Component {
 
   static navigationOptions = ({ navigation }) => ({
-    title: navigation.state.params.orderId === -1 ? "New Order" : ("Edit Order " + navigation.state.params.orderId),
+    title: `Edit Order (${navigation.state.params.orderId})`,
     headerStyle: { backgroundColor: 'steelblue' },
     headerTitleStyle: { color: 'darkblue', fontSize: 20, },
     headerLeft: (
@@ -75,99 +63,221 @@ class EditOrder extends Component {
           style={{
             borderRadius: 20,
           }}
-          underlayColor='#578dba' onPress={() => { EditOrder.addItem(); }}>
+          underlayColor='#578dba' onPress={() => { navigation.state.params.addLineItemOnPress(); }}>
           <MaterialIcon name='add-circle-outline' color='white' size={30} style={{ alignSelf: 'center', marginLeft: 5, marginTop: 5, marginBottom: 5, marginRight: 5 }} />
         </TouchableHighlight>
+        { /* only show the trashcan icon (used to delete line items) if at least one item has been selected */}
+        {navigation.state.params.isItemSelected &&
+          <TouchableHighlight
+            style={{
+              borderRadius: 20,
+            }}
+            underlayColor='#578dba' onPress={() => { navigation.state.params.deleteLineItemsOnPress(); }}>
+            <IoniconsIcon name='ios-trash-outline' color='white' size={30} style={{ alignSelf: 'center', marginLeft: 10, marginTop: 5, marginBottom: 0, marginRight: 5 }} />
+          </TouchableHighlight>
+        }
       </View>
     ),
   });
 
-  static instance = undefined;
-
   constructor(props) {
-    debugger;
     super(props);
-    EditOrder.instance = this;
-    let order = {};
-    if (this.props.navigation.state.params.orderId === -1) {
-      order.id = -1;
-      order.lineItems = [];
-    } else {
-      // todo: fetch order from web service
-    }
-    this.state = { dataSource: undefined, order };
+    this.state = { dataSource: undefined };
   }
 
-  static addItem = () => {
-    let self = EditOrder.instance;
-    const navigation = self.props.navigation;
-    Alert.alert('test', `inside addItem, self.state.order.id = ${self.state.order.id}`);
-    navigation.navigate('EditOrderLineItem',
+  componentDidMount() {
+    // wire up the navigation parameters
+    this.props.navigation.setParams(
       {
-        userId: navigation.state.params.userId,
-        orderId: self.state.order.id,
-        orderLineItemId: -1,
-        addLineItemToOrder: (lineItem) => { self.state.order.lineItems.push(lineItem); }
+        isItemSelected: false,
+        deleteLineItemsOnPress: this.deleteLineItemsOnPress,
+        addLineItemOnPress: this.addLineItemOnPress
+      }
+    );
+    this.getOrderDetails();
+  }
+
+  addLineItemOnPress = () => {
+    Alert.alert('test', `inside addLineItemOnPress`);
+  }
+
+  deleteLineItemsOnPress = () => {
+    debugger;
+    const self = this;
+    co(function* () {
+      // fetch the order from persistence to make sure we have latest version
+      debugger;
+      let res = yield ordersApi.getOrder(self.props.navigation.state.params.orderId);
+      debugger;
+      const order = JSON.parse(res.text);
+
+      // create a newLineItems array which will contain all the line items which the user did *not* select
+      // to delete (e.g. it will contain the line items we are keeping)
+      let newLineItems = [];
+      _.forEach(order.lineItems, (lineItem) => {
+        debugger;
+        let foundRec = _.find(self.state.orderLineItems, (i) => {
+          // if isSelected is true, it means this is a line item which is to be deleted,
+          // so we *don't* want to include it in newLineItems
+          return i.id === lineItem.id && !i.isSelected;
+        });
+        if (!_.isUndefined(foundRec)) {
+          newLineItems.push(lineItem);
+        }
       });
 
-    // navigation.navigate.push({
-    //   name: 'EditOrderLineItem',
-    //   passProps: {
-    //     userId: this.props.userId,
-    //     orderId: this.state.order.id,
-    //     orderLineItemId: -1,
-    //     addLineItemToOrder: (lineItem) => { this.state.order.lineItems.push(lineItem); },
-    //   }
-    // });
+      debugger;
+
+      // apply line item deletions to persistence then update the state
+      order.lineItems = newLineItems;
+      yield ordersApi.saveOrder(order);
+      debugger;
+      self.updateLineItemState(self, order.lineItems);
+    });
   }
 
-  deleteItems = () => {
+  getOrderDetails = () => {
+    ordersApi.getOrderLineItems(this.props.navigation.state.params.orderId).then((res) => {
+      const orderLineItems = JSON.parse(res.text);
+      _.forEach(orderLineItems, (i) => {
+        i.isSelected = false;
+      });
+
+      this.updateLineItemState(this, orderLineItems);
+
+    }).catch((err) => {
+      Alert.alert('error getting order details!', `${JSON.stringify(err) || '-- could not get order details'}`);
+    });
   }
 
-  save = () => {
+  updateLineItemState = (self, newOrderLineItems) => {
+    let ds = new ListView.DataSource({
+      rowHasChanged: (r1, r2) => r1 !== r2
+    });
+
+    self.setState({
+      dataSource: ds.cloneWithRows(newOrderLineItems),
+      orderLineItems: newOrderLineItems
+    });
+
+    let numSelectedLineItems =
+      _.filter(newOrderLineItems, (i) => { if (i.isSelected) return i; }).length;
+    self.props.navigation.setParams({ isItemSelected: numSelectedLineItems > 0 });
   }
 
-  renderRow = () => {
+  toggleSelectedItem = (id) => {
+    // update the data source, flipping the selected state for the line item matching passed in id
+    let newOrderLineItems = _.cloneDeep(this.state.orderLineItems);
+
+    _.forEach(newOrderLineItems, (lineItem) => {
+      if (lineItem.id === id) {
+        lineItem.isSelected = !lineItem.isSelected;
+      }
+    });
+
+    this.updateLineItemState(this, newOrderLineItems);
+  }
+
+  editItem = (id) => {
+    Alert.alert('test', `inside editItem, id = ${id}`);
+  }
+
+  renderRow = (record) => {
+    // set up image URL for product (e.g. product image could be a picture of a Ford F150 truck, for example)
+    let src = Config.restApi.baseUrl + record.productImageUri;
+    let iconImage = <Image resizeMode='contain' source={{ uri: src }} style={styles.icon} />;
+    return (
+      <View style={styles.row}>
+        <TouchableHighlight
+          underlayColor='transparent'
+          style={{ alignSelf: 'center' }}
+          onPress={() => { this.toggleSelectedItem(record.id); }}
+        >
+          <FontAwesomeIcon name={record.isSelected ? 'circle' : 'circle-o'} color='steelblue' size={20}
+            style={{ alignSelf: 'center', marginLeft: 5, marginTop: 5, marginBottom: 5, marginRight: 7 }} />
+        </TouchableHighlight>
+
+        <TouchableHighlight
+          underlayColor='transparent'
+          style={{ flex: 1, flexDirection: 'row' }}
+          onPress={() => { this.editItem(record.id); }}
+        >
+          <View style={{ flex: 1, flexDirection: 'row' }}>
+            <View style={{ backgroundColor: 'white' }}>
+              {iconImage}
+            </View>
+            <View style={{
+              flex: 1,
+              paddingLeft: 8,
+              paddingRight: 8,
+            }}>
+              <Text style={{ fontSize: 23, color: 'darkblue', fontWeight: 'bold' }}>{record.productName}</Text>
+              <View style={{ flex: 1 }}>
+                <View style={{ flex: 1, flexDirection: 'row' }}>
+                  <Text style={{ flex: .5, color: 'darkblue', fontSize: 13 }}>Color: {record.colorName}</Text>
+                  <Text style={{ flex: .5, color: 'darkblue', fontSize: 13 }}>Type: {record.productTypeName}</Text>
+                </View>
+                <View style={{ flex: 1, flexDirection: 'row' }}>
+                  <Text style={{ color: 'darkblue' }}>Line Item Id: {record.id}</Text>
+                </View>
+              </View>
+            </View>
+          </View>
+        </TouchableHighlight>
+      </View>
+    );
+  }
+
+  goBackOnPress = () => {
+    this.props.navigator.pop();
+  }
+
+  deleteOnPress = () => {
+    const self = this;
+    co(function* () {
+      // fetch the order from persistence to make sure we have latest version
+      let res = yield ordersApi.getOrder(self.props.orderId);
+      const order = JSON.parse(res.text);
+
+      // create a newLineItems array which will contain all the line items which the user did *not* select
+      // to delete (e.g. it will contain the line items we are keeping)
+      let newLineItems = [];
+      _.forEach(order.lineItems, (lineItem) => {
+        let foundRec = _.find(self.state.orderLineItems, (i) => {
+          // if isSelected is true, it means this is a line item which is to be deleted,
+          // so we *don't* want to include it in newLineItems
+          return i.id === lineItem.id && !i.isSelected;
+        });
+        if (!_.isUndefined(foundRec)) {
+          newLineItems.push(lineItem);
+        }
+      });
+
+      // apply line item deletions to persistence
+      order.lineItems = newLineItems;
+      yield ordersApi.saveOrder(order);
+      self.updateLineItemState(self, order.lineItems);
+    });
   }
 
   render() {
-    let header = this.state.order.id === -1 ? "New Order" : ("Edit Order " + this.state.order.id);
-    let listView = this.state.order.id === -1 ? (<View></View>) :
-      (<ListView
-        dataSource={this.state.dataSource}
-        renderRow={this.renderRow}
-      />
+    if (_.isUndefined(this.state.dataSource)) {
+      return (
+        <View>
+          <Text>Loading...</Text>
+        </View>
       );
+    }
+
+    let numSelectedItems =
+      _.filter(this.state.orderLineItems, (i) => { if (i.isSelected) return i; }).length;
 
     return (
-      <View style={styles.mainContainer}>
-        <View style={styles.mainHeader}>
-          <Text style={styles.headerText}>{header}</Text>
-        </View>
-        <View style={styles.buttonContainer}>
-          <View style={{ width: 90 }}>
-            <Button
-              onPress={this.addItem}
-              title="Add Item"
-              color='#841584'
-            />
-          </View>
-          <View style={{ width: 120 }}>
-            <Button
-              onPress={this.deleteItems}
-              title="Delete Items"
-              color='#841584'
-            />
-          </View>
-          <View style={{ width: 90 }}>
-            <Button
-              onPress={this.save}
-              title="Save"
-              color='#841584'
-            />
-          </View>
-        </View>
-        {listView}
+      <View style={{ flex: 1, flexDirection: 'column', backgroundColor: 'lightsteelblue' }}>
+        <ListView
+          dataSource={this.state.dataSource}
+          renderRow={this.renderRow}
+        />
       </View>
     );
   }

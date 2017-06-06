@@ -83,16 +83,7 @@ class RecentOrders extends Component {
     title: 'Recent Orders',
     headerStyle: { backgroundColor: 'steelblue' },
     headerTitleStyle: { color: 'darkblue', fontSize: 20, },
-    headerLeft: (
-      <View style={{ flexDirection: 'row' }}>
-        <TouchableHighlight
-          style={{
-            borderRadius: 20,
-          }}
-          underlayColor='#578dba' onPress={() => { navigation.goBack(); }}>
-          <FontAwesomeIcon name='arrow-circle-left' color='white' size={30} style={{ alignSelf: 'center', marginLeft: 5, marginTop: 5, marginBottom: 5, marginRight: 5 }} />
-        </TouchableHighlight>
-      </View>
+    headerLeft: ( <View></View>
     ),
     headerRight: (
       <View style={{ flexDirection: 'row' }}>
@@ -118,10 +109,12 @@ class RecentOrders extends Component {
   });
 
   static newOrderOnPress = (navigation) => {
-    navigation.navigate('EditOrder',
+    // take user to EditOrderLineItem screen, which will allow them to add the first line item to the new order
+    navigation.navigate('EditOrderLineItem',
       {
         userId: navigation.state.params.userId,
-        orderId: -1
+        orderId: -1,
+        orderLineItemId: -1,
       });
   }
 
@@ -190,9 +183,9 @@ class RecentOrders extends Component {
     });
   }
 
-  viewOrderDetailsOnPress = (orderId) => {
+  editOrderOnPress = (orderId) => {
     debugger;
-    this.props.navigation.navigate('OrderDetails',
+    this.props.navigation.navigate('EditOrder',
       {
         orderId: orderId,
         userId: this.props.navigation.state.params.userId,
@@ -242,11 +235,12 @@ class RecentOrders extends Component {
               style={{
                 borderRadius: 20,
               }}
-              underlayColor='#578dba' onPress={() => { this.viewOrderDetailsOnPress(record.id); }}>
+              underlayColor='#578dba' onPress={() => { this.editOrderOnPress(record.id); }}>
               <FontAwesomeIcon name='edit' color='white' size={30}
                 style={
                   {
                     alignSelf: 'center',
+                    marginLeft: 12,
                   }
                 } />
             </TouchableHighlight>
@@ -279,7 +273,6 @@ class RecentOrders extends Component {
     if (_.isUndefined(this.state.dataSource)) {
       return <View></View>;
     }
-    // test comment
     return (
       <View style={{ flex: 1, flexDirection: 'column', backgroundColor: 'lightsteelblue' }}>
         <ListView

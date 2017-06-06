@@ -20,7 +20,6 @@ class PickerListView extends Component {
 
   constructor(props) {
     super(props);
-    debugger;
     let ds = new ListView.DataSource({
       rowHasChanged: (r1, r2) => r1 !== r2
     });
@@ -39,7 +38,6 @@ class PickerListView extends Component {
   }
 
   renderRow = (item) => {
-    debugger;
     return (
       <View style={{ flex: 1, flexDirection: 'column' }}>
         <TouchableHighlight onPress={() => this.pickItem(item)} style={{ marginTop: 10 }}>
@@ -51,7 +49,7 @@ class PickerListView extends Component {
 
   render() {
     return (
-      <View style={{ flex: 1,}}>
+      <View style={{ flex: 1, backgroundColor: 'lightsteelblue',}}>
         <View style={{
           flexDirection: 'row', justifyContent: 'space-around', alignSelf: 'stretch', backgroundColor: 'skyblue', borderWidth: 1,
           borderColor: 'purple',
