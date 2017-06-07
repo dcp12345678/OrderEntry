@@ -15,7 +15,6 @@ import data from '../data/sales.json';
 import OrdersApi from '../api/OrdersApi';
 import _ from 'lodash';
 import Helper from '../helpers/Helper';
-import co from 'co';
 import Promise from 'bluebird';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
@@ -127,17 +126,16 @@ class RecentOrders extends Component {
     this.getOrders();
   }
 
-  getOrders = () => {
-    let self = this;
-    self.setState({ showSpinner: true });
-    co(function* () {
-      let res = yield ordersApi.getOrdersForUser(self.props.navigation.state.params.userId);
+  getOrders = async () => {
+    try {
+      this.setState({ showSpinner: true });
+      let res = await ordersApi.getOrdersForUser(this.props.navigation.state.params.userId);
       let orders = JSON.parse(res.text);
 
       for (let i = 0; i < orders.length; ++i) {
         const o = orders[i];
         o.isExpanded = false;  // indicates whether order is expanded to include its details
-        let res = yield ordersApi.getOrderLineItems(o.id);
+        let res = await ordersApi.getOrderLineItems(o.id);
         const orderLineItems = JSON.parse(res.text);
         o.lineItems = orderLineItems;
         o.products = {};
@@ -154,15 +152,15 @@ class RecentOrders extends Component {
       let ds = new ListView.DataSource({
         rowHasChanged: (r1, r2) => r1 !== r2
       });
-      self.setState({
+      this.setState({
         dataSource: ds.cloneWithRows(orders),
         orders
       });
-      self.setState({ showSpinner: false });
-    }).catch((err) => {
-      self.setState({ showSpinner: false });
+      this.setState({ showSpinner: false });
+    } catch (err) {
+      this.setState({ showSpinner: false });
       Alert.alert('error getting orders!', `${JSON.stringify(err) || '-- could not get orders'}`);
-    });
+    }
   }
 
   orderOnPress = (orderId) => {

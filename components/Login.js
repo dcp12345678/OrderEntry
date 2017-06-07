@@ -69,14 +69,13 @@ class Login extends Component {
     this.state = { showSpinner: false };
   }
 
-  loginOnPress = () => {
-    this.setState({ showSpinner: true });
-    authApi.login(this.state.loginId, this.state.password).then((loginResult) => {
+  loginOnPress = async () => {
+    try {
+      this.setState({ showSpinner: true });
+      let loginResult = await authApi.login(this.state.loginId, this.state.password);
       this.setState({ showSpinner: false });
       const obj = JSON.parse(loginResult.text);
-      // this.props.auth.setToken(authResult.accessToken);
       if (obj.result === 'successful login') {
-        //Alert.alert('login successful');
         this.props.navigation.navigate('RecentOrders',
           {
             userId: obj.userId,
@@ -84,12 +83,11 @@ class Login extends Component {
       } else {
         this.setState({ showSpinner: false });
         Alert.alert('login failed!', `${obj.result || '--- could not login'}`);
-        //hashHistory.push('/login');
       }
-    }).catch((err) => {
+    } catch (err) {
       this.setState({ showSpinner: false });
       Alert.alert('login failed!', `${JSON.stringify(err) || '-- could not login'}`);
-    });
+    };
   }
 
   render() {

@@ -19,7 +19,6 @@ import OrdersApi from '../api/OrdersApi';
 import LookupApi from '../api/LookupApi';
 import _ from 'lodash';
 import Helper from '../helpers/Helper';
-import co from 'co';
 import Promise from 'bluebird';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
@@ -86,27 +85,29 @@ class EditOrderLineItem extends Component {
       isNew: this.props.navigation.state.params.orderLineItemId === -1,
       showSpinner: true,
     };
+    this.init();
+  }
 
-    const self = this;
+  init = async () => {
     const navParams = this.props.navigation.state.params;
-    co(function* init() {
+    try {
       // get product types and colors and store them in state
-      let res = yield lookupApi.getColors();
+      let res = await lookupApi.getColors();
       const colors = JSON.parse(res.text);
-      res = yield lookupApi.getProductTypes();
+      res = await lookupApi.getProductTypes();
       const productTypes = JSON.parse(res.text);
-      self.setState({ colors, productTypes, products: [] });
+      this.setState({ colors, productTypes, products: [] });
 
       let lineItem = {};
-      if (!self.state.isNew) {
+      if (!this.state.isNew) {
         // editing an existing line item, so fetch it from persistence
-        const x = yield ordersApi.getOrderLineItem(navParams.orderId, navParams.orderLineItemId);
+        const x = await ordersApi.getOrderLineItem(navParams.orderId, navParams.orderLineItemId);
         lineItem = JSON.parse(x.text);
 
         // get the products for the line item's product type and store them in state
-        res = yield lookupApi.getProductsForProductType(lineItem.productTypeId);
+        res = await lookupApi.getProductsForProductType(lineItem.productTypeId);
         const products = JSON.parse(res.text);
-        self.setState({ products });
+        this.setState({ products });
       } else {
         // create a new order line item
         lineItem = {
@@ -116,15 +117,16 @@ class EditOrderLineItem extends Component {
           colorId: -1,
         }
       }
-      self.setState({
+      this.setState({
         lineItem,
         isLoaded: true,
         showSpinner: false,
       });
-    }).catch((err) => {
+    } catch(err) {
       this.state = { showSpinner: false };
       Alert.alert('error initializing form', `${JSON.stringify(err) || '-- error initializing form'}`);
-    });
+    };
+
   }
 
   componentDidMount() {
@@ -147,18 +149,17 @@ class EditOrderLineItem extends Component {
 
   }
 
-  save = () => {
-    const self = this;
+  save = async () => {
     const navigation = this.props.navigation;
     const lineItem = this.state.lineItem;
-    co(function* () {
+    try {
       let order = {};
       order.id = -1;
       order.userId = navigation.state.params.userId;
       order.lineItems = [];
       if (navigation.state.params.orderId !== -1) {
         // fetch existing order from persistence
-        let res = yield ordersApi.getOrder(navigation.state.params.orderId);
+        let res = await ordersApi.getOrder(navigation.state.params.orderId);
         order = JSON.parse(res.text);
       }
 
@@ -173,7 +174,7 @@ class EditOrderLineItem extends Component {
         order.lineItems[index] = lineItem;
       }
 
-      let res = yield ordersApi.saveOrder(order);
+      let res = await ordersApi.saveOrder(order);
 
       // if we are creating a new order, get the new order's ID
       if (navigation.state.params.orderId === -1) {
@@ -187,11 +188,9 @@ class EditOrderLineItem extends Component {
           userId: navigation.state.params.userId,
           orderId: order.id,
         });
-
-    }).catch((err) => {
+    } catch(err) {
       Alert.alert('error saving order', `${JSON.stringify(err) || '-- error saving order'}`);
-    });
-
+    };
   }
 
   pickColor = (color) => {
@@ -200,19 +199,19 @@ class EditOrderLineItem extends Component {
     this.setState({ lineItem });
   }
 
-  pickProductType = (productType) => {
-    const self = this;
-    co(function* handleChange() {
-      const res = yield lookupApi.getProductsForProductType(productType.id);
+  pickProductType = async (productType) => {
+    try {
+      const res = await lookupApi.getProductsForProductType(productType.id);
       const products = JSON.parse(res.text);
-      //Alert.alert(`products = ${JSON.stringify(products)}`);
-      let lineItem = self.state.lineItem;
+      let lineItem = this.state.lineItem;
       lineItem.productTypeId = productType.id;
       lineItem.products = products;
       lineItem.productId = -1; // deselect any previously selected product
       lineItem.colorId = -1; // deselect any previously selected color
-      self.setState({ lineItem, products });
-    });
+      this.setState({ lineItem, products });
+    } catch(err) {
+      Alert.alert('error picking product type', `${JSON.stringify(err) || '-- error picking product type'}`);
+    }
   }
 
   pickProduct = (product) => {
