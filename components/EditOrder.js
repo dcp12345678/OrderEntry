@@ -19,6 +19,7 @@ import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import IoniconsIcon from 'react-native-vector-icons/Ionicons';
 import Config from '../config';
+import Spinner from 'react-native-loading-spinner-overlay';
 
 const styles = StyleSheet.create({
   row: {
@@ -89,7 +90,11 @@ class EditOrder extends Component {
 
   constructor(props) {
     super(props);
-    this.state = { dataSource: undefined };
+    this.state =
+      {
+        dataSource: undefined,
+        showSpinner: false,
+      };
   }
 
   componentDidMount() {
@@ -150,6 +155,7 @@ class EditOrder extends Component {
   }
 
   getOrderDetails = () => {
+    this.setState({ showSpinner: true });
     ordersApi.getOrderLineItems(this.props.navigation.state.params.orderId).then((res) => {
       const orderLineItems = JSON.parse(res.text);
       _.forEach(orderLineItems, (i) => {
@@ -157,8 +163,9 @@ class EditOrder extends Component {
       });
 
       this.updateLineItemState(this, orderLineItems);
-
+      this.setState({ showSpinner: false });
     }).catch((err) => {
+      this.setState({ showSpinner: false });
       Alert.alert('error getting order details!', `${JSON.stringify(err) || '-- could not get order details'}`);
     });
   }
@@ -288,6 +295,7 @@ class EditOrder extends Component {
 
     return (
       <View style={{ flex: 1, flexDirection: 'column', backgroundColor: 'lightsteelblue' }}>
+        <Spinner visible={this.state.showSpinner} textContent={"Loading..."} textStyle={{ color: '#FFF' }} />
         <ListView
           dataSource={this.state.dataSource}
           renderRow={this.renderRow}
