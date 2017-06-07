@@ -113,24 +113,25 @@ class EditOrder extends Component {
   }
 
   addLineItemOnPress = () => {
-    Alert.alert('test', `inside addLineItemOnPress`);
+    this.props.navigation.navigate('EditOrderLineItem',
+      {
+        userId: this.props.navigation.state.params.userId,
+        orderId: this.props.navigation.state.params.orderId,
+        orderLineItemId: -1,
+      });
   }
 
   deleteLineItemsOnPress = () => {
-    debugger;
     const self = this;
     co(function* () {
       // fetch the order from persistence to make sure we have latest version
-      debugger;
       let res = yield ordersApi.getOrder(self.props.navigation.state.params.orderId);
-      debugger;
       const order = JSON.parse(res.text);
 
       // create a newLineItems array which will contain all the line items which the user did *not* select
       // to delete (e.g. it will contain the line items we are keeping)
       let newLineItems = [];
       _.forEach(order.lineItems, (lineItem) => {
-        debugger;
         let foundRec = _.find(self.state.orderLineItems, (i) => {
           // if isSelected is true, it means this is a line item which is to be deleted,
           // so we *don't* want to include it in newLineItems
@@ -141,12 +142,9 @@ class EditOrder extends Component {
         }
       });
 
-      debugger;
-
       // apply line item deletions to persistence then update the state
       order.lineItems = newLineItems;
       yield ordersApi.saveOrder(order);
-      debugger;
       self.updateLineItemState(self, order.lineItems);
     });
   }
@@ -194,7 +192,12 @@ class EditOrder extends Component {
   }
 
   editItem = (id) => {
-    Alert.alert('test', `inside editItem, id = ${id}`);
+    this.props.navigation.navigate('EditOrderLineItem',
+      {
+        userId: this.props.navigation.state.params.userId,
+        orderId: this.props.navigation.state.params.orderId,
+        orderLineItemId: id,
+      });
   }
 
   renderRow = (record) => {

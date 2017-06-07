@@ -157,7 +157,6 @@ class RecentOrders extends Component {
         orders
       });
     }).catch((err) => {
-      debugger;
       Alert.alert('error getting orders!', `${JSON.stringify(err) || '-- could not get orders'}`);
     });
   }
@@ -184,7 +183,6 @@ class RecentOrders extends Component {
   }
 
   editOrderOnPress = (orderId) => {
-    debugger;
     this.props.navigation.navigate('EditOrder',
       {
         orderId: orderId,

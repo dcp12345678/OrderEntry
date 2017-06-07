@@ -62,8 +62,7 @@ const lookupApi = new LookupApi();
 
 class EditOrderLineItem extends Component {
   static navigationOptions = ({ navigation }) => ({
-    title: navigation.state.params.orderLineItemId === -1 ? "New Order - Add Item" :
-      ("Edit Order Item " + navigation.state.params.orderLineItemId),
+    title: navigation.state.params.title,
     headerStyle: { backgroundColor: 'steelblue' },
     headerTitleStyle: { color: 'darkblue', fontSize: Platform.OS === 'ios' ? 18 : 20, },
     headerLeft: (
@@ -87,7 +86,9 @@ class EditOrderLineItem extends Component {
     };
 
     const self = this;
+    const navParams = this.props.navigation.state.params;
     co(function* init() {
+      // get product types and colors and store them in state
       let res = yield lookupApi.getColors();
       const colors = JSON.parse(res.text);
       res = yield lookupApi.getProductTypes();
@@ -95,18 +96,15 @@ class EditOrderLineItem extends Component {
       self.setState({ colors, productTypes, products: [] });
 
       let lineItem = {};
-      debugger;
       if (!self.state.isNew) {
-        // editing an existing line item
-        // const x = yield ordersApi.getOrder(self.props.orderId);
-        // order = JSON.parse(x.text);
+        // editing an existing line item, so fetch it from persistence
+        const x = yield ordersApi.getOrderLineItem(navParams.orderId, navParams.orderLineItemId);
+        lineItem = JSON.parse(x.text);
 
-        // // get available products for each line item on the order
-        // const promiseResults =
-        //   yield _.map(order.lineItems, (lineItem) => lookupApi.getProductsForProductType(lineItem.productTypeId));
-        // _.forEach(order.lineItems, (lineItem, index) => {
-        //   lineItem.availProducts = JSON.parse(promiseResults[index].text);
-        // });
+        // get the products for the line item's product type and store them in state
+        res = yield lookupApi.getProductsForProductType(lineItem.productTypeId);
+        const products = JSON.parse(res.text);
+        self.setState({ products });
       } else {
         // create a new order line item
         lineItem = {
@@ -125,14 +123,33 @@ class EditOrderLineItem extends Component {
     });
   }
 
-  save = () => {
-    Alert.alert('test', 'inside save');
+  componentDidMount() {
+    debugger;
+    const nav = this.props.navigation;
 
+    // determine the title to use in the navigation header
+    let title;
+    if (nav.state.params.orderId === -1) {
+      title = "New Order - Add Item";
+    } else {
+      title = nav.state.params.orderLineItemId === -1 ? `Add Order Item - Order ${nav.state.params.orderId}` :
+        `Edit Order Item - Item ID: ${nav.state.params.orderLineItemId}`;
+    }
+
+    // wire up the navigation parameters
+    nav.setParams(
+      {
+        title
+      }
+    );
+
+  }
+
+  save = () => {
     const self = this;
     const navigation = this.props.navigation;
     const lineItem = this.state.lineItem;
     co(function* () {
-      debugger;
       let order = {};
       order.id = -1;
       order.userId = navigation.state.params.userId;
@@ -140,13 +157,13 @@ class EditOrderLineItem extends Component {
       if (navigation.state.params.orderId !== -1) {
         // fetch existing order from persistence
         let res = yield ordersApi.getOrder(navigation.state.params.orderId);
-        debugger;
         order = JSON.parse(res.text);
       }
 
+      debugger;
       if (lineItem.id === -1) {
         // add new line item to order
-        lineItem.id = order.lineItems.length == 0 ? 0 : _.maxBy(order.lineItems, 'id') + 1;
+        lineItem.id = order.lineItems.length == 0 ? 0 : _.maxBy(order.lineItems, 'id').id + 1;
         order.lineItems.push(lineItem);
       } else {
         // update existing line item in order
@@ -154,9 +171,7 @@ class EditOrderLineItem extends Component {
         order.lineItems[index] = lineItem;
       }
 
-      debugger;
       let res = yield ordersApi.saveOrder(order);
-      debugger;
 
       // if we are creating a new order, get the new order's ID
       if (navigation.state.params.orderId === -1) {
@@ -208,8 +223,6 @@ class EditOrderLineItem extends Component {
     if (!this.state.isLoaded) {
       return (<View><Text>loading...</Text></View>);
     }
-
-    //Alert.alert(`lineItem = ${JSON.stringify(this.state.lineItem)}`);
 
     // determine if all line item values have been entered (we'll use this info to determine if save button should
     // be shown)

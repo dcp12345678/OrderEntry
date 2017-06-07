@@ -87,7 +87,6 @@ class Login extends Component {
         //hashHistory.push('/login');
       }
     }).catch((err) => {
-      debugger;
       this.setState({ showSpinner: false });
       Alert.alert('login failed!', `${JSON.stringify(err) || '-- could not login'}`);
     });

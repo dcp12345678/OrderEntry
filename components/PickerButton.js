@@ -35,7 +35,7 @@ class PickerButton extends Component {
 
     if (this.props.selectedItemId !== -1) {
       let match = _.filter(this.props.data, (row) => row.id === this.props.selectedItemId);
-      if (!_.isUndefined(match)) {
+      if (!_.isUndefined(match) && match.length > 0) {
         defaultItemText = match[0].name;
       }
     }
