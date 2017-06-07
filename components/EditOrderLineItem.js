@@ -12,6 +12,7 @@ import {
   Dimensions,
   TouchableOpacity,
   TextInput,
+  Platform,
 } from 'react-native';
 import PickerButton from './PickerButton';
 import OrdersApi from '../api/OrdersApi';
@@ -20,12 +21,10 @@ import _ from 'lodash';
 import Helper from '../helpers/Helper';
 import co from 'co';
 import Promise from 'bluebird';
-
-const basketIcon = require('../images/basket.png');
-const carIcon = require('../images/car.png');
-const truckIcon = require('../images/truck.png');
-const motorcycleIcon = require('../images/motorcycle.png');
-const winWidth = Dimensions.get('window').width;
+import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
+import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
+import IoniconsIcon from 'react-native-vector-icons/Ionicons';
+import LinearGradient from 'react-native-linear-gradient';
 
 const styles = StyleSheet.create({
   mainHeader: {
@@ -42,7 +41,8 @@ const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
     flexDirection: 'column',
-    //backgroundColor: '#fff',
+    backgroundColor: 'lightsteelblue',
+    justifyContent: 'flex-start',
   },
   headerText: {
     fontSize: 18,
@@ -61,17 +61,34 @@ const ordersApi = new OrdersApi();
 const lookupApi = new LookupApi();
 
 class EditOrderLineItem extends Component {
+  static navigationOptions = ({ navigation }) => ({
+    title: navigation.state.params.title,
+    headerStyle: { backgroundColor: 'steelblue' },
+    headerTitleStyle: { color: 'darkblue', fontSize: Platform.OS === 'ios' ? 18 : 20, },
+    headerLeft: (
+      <View style={{ flexDirection: 'row' }}>
+        <TouchableHighlight
+          style={{
+            borderRadius: 20,
+          }}
+          underlayColor='#578dba' onPress={() => { navigation.goBack(); }}>
+          <FontAwesomeIcon name='arrow-circle-left' color='white' size={30} style={{ alignSelf: 'center', marginLeft: 5, marginTop: 5, marginBottom: 5, marginRight: 5 }} />
+        </TouchableHighlight>
+      </View>
+    ),
+  });
 
   constructor(props) {
     super(props);
     this.state = {
       isLoaded: false,
-      disableSave: true,
-      isNew: this.props.orderLineItemId === -1
+      isNew: this.props.navigation.state.params.orderLineItemId === -1
     };
 
     const self = this;
+    const navParams = this.props.navigation.state.params;
     co(function* init() {
+      // get product types and colors and store them in state
       let res = yield lookupApi.getColors();
       const colors = JSON.parse(res.text);
       res = yield lookupApi.getProductTypes();
@@ -79,18 +96,15 @@ class EditOrderLineItem extends Component {
       self.setState({ colors, productTypes, products: [] });
 
       let lineItem = {};
-      debugger;
       if (!self.state.isNew) {
-        // editing an existing line item
-        // const x = yield ordersApi.getOrder(self.props.orderId);
-        // order = JSON.parse(x.text);
+        // editing an existing line item, so fetch it from persistence
+        const x = yield ordersApi.getOrderLineItem(navParams.orderId, navParams.orderLineItemId);
+        lineItem = JSON.parse(x.text);
 
-        // // get available products for each line item on the order
-        // const promiseResults =
-        //   yield _.map(order.lineItems, (lineItem) => lookupApi.getProductsForProductType(lineItem.productTypeId));
-        // _.forEach(order.lineItems, (lineItem, index) => {
-        //   lineItem.availProducts = JSON.parse(promiseResults[index].text);
-        // });
+        // get the products for the line item's product type and store them in state
+        res = yield lookupApi.getProductsForProductType(lineItem.productTypeId);
+        const products = JSON.parse(res.text);
+        self.setState({ products });
       } else {
         // create a new order line item
         lineItem = {
@@ -107,29 +121,84 @@ class EditOrderLineItem extends Component {
     }).catch((err) => {
       Alert.alert('error initializing form', `${JSON.stringify(err) || '-- error initializing form'}`);
     });
-
   }
 
-  disableSave = () => {
-    return true;
+  componentDidMount() {
+    debugger;
+    const nav = this.props.navigation;
+
+    // determine the title to use in the navigation header
+    let title;
+    if (nav.state.params.orderId === -1) {
+      title = "New Order - Add Item";
+    } else {
+      title = nav.state.params.orderLineItemId === -1 ? `Add Order Item - Order ${nav.state.params.orderId}` :
+        `Edit Order Item - Item ID: ${nav.state.params.orderLineItemId}`;
+    }
+
+    // wire up the navigation parameters
+    nav.setParams(
+      {
+        title
+      }
+    );
+
   }
 
   save = () => {
-  }
+    const self = this;
+    const navigation = this.props.navigation;
+    const lineItem = this.state.lineItem;
+    co(function* () {
+      let order = {};
+      order.id = -1;
+      order.userId = navigation.state.params.userId;
+      order.lineItems = [];
+      if (navigation.state.params.orderId !== -1) {
+        // fetch existing order from persistence
+        let res = yield ordersApi.getOrder(navigation.state.params.orderId);
+        order = JSON.parse(res.text);
+      }
 
-  cancel = () => {
+      debugger;
+      if (lineItem.id === -1) {
+        // add new line item to order
+        lineItem.id = order.lineItems.length == 0 ? 0 : _.maxBy(order.lineItems, 'id').id + 1;
+        order.lineItems.push(lineItem);
+      } else {
+        // update existing line item in order
+        let index = _.findIndex(order.lineItems, i => i.id === lineItem.id);
+        order.lineItems[index] = lineItem;
+      }
+
+      let res = yield ordersApi.saveOrder(order);
+
+      // if we are creating a new order, get the new order's ID
+      if (navigation.state.params.orderId === -1) {
+        let resObj = JSON.parse(res.text);
+        order.id = resObj.orderId;
+      }
+
+      // go to edit order screen to show the details for the order
+      navigation.navigate('EditOrder',
+        {
+          userId: navigation.state.params.userId,
+          orderId: order.id,
+        });
+
+    }).catch((err) => {
+      Alert.alert('error saving order', `${JSON.stringify(err) || '-- error saving order'}`);
+    });
+
   }
 
   pickColor = (color) => {
-    //Alert.alert(`pickColor ${JSON.stringify(color)}`);
     let lineItem = this.state.lineItem;
     lineItem.colorId = color.id;
     this.setState({ lineItem });
   }
 
   pickProductType = (productType) => {
-    //Alert.alert(`pickProductType ${JSON.stringify(productType)}`);
-
     const self = this;
     co(function* handleChange() {
       const res = yield lookupApi.getProductsForProductType(productType.id);
@@ -145,7 +214,6 @@ class EditOrderLineItem extends Component {
   }
 
   pickProduct = (product) => {
-    //Alert.alert(`pickProduct ${JSON.stringify(product)}`);
     let lineItem = this.state.lineItem;
     lineItem.productId = product.id;
     this.setState({ lineItem });
@@ -156,69 +224,63 @@ class EditOrderLineItem extends Component {
       return (<View><Text>loading...</Text></View>);
     }
 
-    //Alert.alert(`lineItem = ${JSON.stringify(this.state.lineItem)}`);
-
-    let header = this.props.orderLineItemId === -1 ? "New Order Item" :
-      ("Edit Order Item " + this.props.orderLineItemId);
+    // determine if all line item values have been entered (we'll use this info to determine if save button should
+    // be shown)
+    const lineItem = this.state.lineItem;
+    const canSave = !_.isUndefined(lineItem) &&
+      !_.isUndefined(lineItem.productTypeId) && lineItem.productTypeId !== -1 &&
+      !_.isUndefined(lineItem.productId) && lineItem.productId !== -1 &&
+      !_.isUndefined(lineItem.colorId) && lineItem.colorId !== -1;
 
     return (
       <View style={styles.mainContainer}>
-        <View style={styles.mainHeader}>
-          <Text style={styles.headerText}>{header}</Text>
-        </View>
-        <View style={{ alignItems: 'center' }}>
-          <View style={styles.buttonContainer}>
-            <View style={{ width: 90 }}>
-              <Button
-                disabled={this.state.disableSave}
-                onPress={this.save}
-                title="Save"
-                color='#841584'
-              />
-            </View>
-            <View style={{ width: 90, marginLeft: 10, }}>
-              <Button
-                onPress={this.cancel}
-                title="Cancel"
-                color='#841584'
-              />
-            </View>
-          </View>
-        </View>
-
         <View>
-          <Text style={{ marginLeft: 10, marginTop: 10, fontSize: 18, fontWeight: 'bold', color: 'black', }}>Product Type</Text>
-          <PickerButton
-            data={this.state.productTypes}
-            itemName="Product Type"
-            selectedItemId={this.state.lineItem.productTypeId}
-            navigator={this.props.navigator}
-            onPickedItem={this.pickProductType} />
+          <View>
+            <Text style={{ marginLeft: 10, marginTop: 10, fontSize: 18, fontWeight: 'bold', color: 'darkblue', }}>Product Type</Text>
+            <PickerButton
+              data={this.state.productTypes}
+              itemName="Product Type"
+              selectedItemId={this.state.lineItem.productTypeId}
+              navigation={this.props.navigation}
+              onPickedItem={this.pickProductType} />
+          </View>
+          {/* only show product and color picker buttons if a product type has been selected */}
+          {this.state.lineItem.productTypeId === -1 ? null :
+            (
+              <View>
+                <View>
+                  <Text style={{ marginLeft: 10, marginTop: 20, fontSize: 18, fontWeight: 'bold', color: 'darkblue', }}>Product</Text>
+                  <PickerButton
+                    data={this.state.products}
+                    itemName="Product"
+                    selectedItemId={this.state.lineItem.productId}
+                    navigation={this.props.navigation}
+                    onPickedItem={this.pickProduct} />
+                </View>
+                <View>
+                  <Text style={{ marginLeft: 10, marginTop: 20, fontSize: 18, fontWeight: 'bold', color: 'darkblue', }}>Product Color</Text>
+                  <PickerButton
+                    data={this.state.colors}
+                    itemName="Product Color"
+                    selectedItemId={this.state.lineItem.colorId}
+                    navigation={this.props.navigation}
+                    onPickedItem={this.pickColor} />
+                </View>
+              </View>
+            )
+          }
         </View>
-        {/* only show product and color picker buttons if a product type has been selected */}
-        {this.state.lineItem.productTypeId === -1 ? null :
-          (
-            <View>
-              <View>
-                <Text style={{ marginLeft: 10, marginTop: 20, fontSize: 18, fontWeight: 'bold', color: 'black', }}>Product</Text>
-                <PickerButton
-                  data={this.state.products}
-                  itemName="Product"
-                  selectedItemId={this.state.lineItem.productId}
-                  navigator={this.props.navigator}
-                  onPickedItem={this.pickProduct} />
+        {/* only show save button if all fields have been entered */}
+        {canSave &&
+          <LinearGradient style={{ borderRadius: 5, alignSelf: 'stretch', justifyContent: 'flex-end', marginLeft: 7, marginRight: 7, marginTop: 40 }}
+            colors={['#4c669f', '#3b5998', '#192f6a']} >
+            <TouchableHighlight underlayColor='steelblue' onPress={this.save}>
+              <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+                <MaterialIcon name='add-shopping-cart' color='white' size={25} style={{ alignSelf: 'center', marginLeft: 5, marginTop: 5, marginBottom: 5 }} />
+                <Text style={{ fontSize: 20, color: 'white', marginLeft: 5, marginTop: 5, marginBottom: 5 }}>Save Item</Text>
               </View>
-              <View>
-                <Text style={{ marginLeft: 10, marginTop: 20, fontSize: 18, fontWeight: 'bold', color: 'black', }}>Product Color</Text>
-                <PickerButton
-                  data={this.state.colors}
-                  itemName="Product Color"
-                  selectedItemId={this.state.lineItem.colorId}
-                  navigator={this.props.navigator}
-                  onPickedItem={this.pickColor} />
-              </View>
-            </View>
-          )
+            </TouchableHighlight>
+          </LinearGradient>
         }
       </View>
     );

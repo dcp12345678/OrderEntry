@@ -24,21 +24,20 @@ class PickerListView extends Component {
       rowHasChanged: (r1, r2) => r1 !== r2
     });
     this.state = {
-      dataSource: ds.cloneWithRows(this.props.data)
+      dataSource: ds.cloneWithRows(this.props.navigation.state.params.data)
     };
   }
 
   pickItem = (item) => {
-    this.props.onPickedItem(item);
-    this.props.navigator.pop();
+    this.props.navigation.state.params.onPickedItem(item);
+    this.props.navigation.goBack();
   }
 
   cancel = () => {
-    this.props.navigator.pop();
+    this.props.navigation.goBack();
   }
 
   renderRow = (item) => {
-    debugger;
     return (
       <View style={{ flex: 1, flexDirection: 'column' }}>
         <TouchableHighlight onPress={() => this.pickItem(item)} style={{ marginTop: 10 }}>
@@ -50,7 +49,7 @@ class PickerListView extends Component {
 
   render() {
     return (
-      <View style={{ flex: 1,}}>
+      <View style={{ flex: 1, backgroundColor: 'lightsteelblue',}}>
         <View style={{
           flexDirection: 'row', justifyContent: 'space-around', alignSelf: 'stretch', backgroundColor: 'skyblue', borderWidth: 1,
           borderColor: 'purple',
