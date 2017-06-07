@@ -20,6 +20,7 @@ import Promise from 'bluebird';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import LinearGradient from 'react-native-linear-gradient';
+import Spinner from 'react-native-loading-spinner-overlay';
 
 const basketIcon = require('../images/basket.png');
 const ordersApi = new OrdersApi();
@@ -128,6 +129,7 @@ class RecentOrders extends Component {
 
   getOrders = () => {
     let self = this;
+    self.setState({ showSpinner: true });
     co(function* () {
       let res = yield ordersApi.getOrdersForUser(self.props.navigation.state.params.userId);
       let orders = JSON.parse(res.text);
@@ -156,7 +158,9 @@ class RecentOrders extends Component {
         dataSource: ds.cloneWithRows(orders),
         orders
       });
+      self.setState({ showSpinner: false });
     }).catch((err) => {
+      self.setState({ showSpinner: false });
       Alert.alert('error getting orders!', `${JSON.stringify(err) || '-- could not get orders'}`);
     });
   }
@@ -192,7 +196,10 @@ class RecentOrders extends Component {
 
   constructor(props) {
     super(props);
-    this.state = { dataSource: undefined };
+    this.state = {
+      dataSource: undefined,
+      showSpinner: false,
+    };
   }
 
   renderRow = (record) => {
@@ -269,7 +276,7 @@ class RecentOrders extends Component {
 
   render() {
     if (_.isUndefined(this.state.dataSource)) {
-      return <View><Text style={{ fontSize: 18 }}>Loading...</Text></View>;
+      return <View><Spinner visible={this.state.showSpinner} textContent={"Loading Orders..."} textStyle={{ color: '#FFF' }} /></View>
     }
     return (
       <View style={{ flex: 1, flexDirection: 'column', backgroundColor: 'lightsteelblue' }}>

@@ -287,7 +287,7 @@ class EditOrder extends Component {
 
   render() {
     if (_.isUndefined(this.state.dataSource)) {
-      return <View><Text style={{ fontSize: 18 }}>Loading...</Text></View>;
+      return <View><Spinner visible={this.state.showSpinner} textContent={"Loading Order..."} textStyle={{ color: '#FFF' }} /></View>
     }
 
     let numSelectedItems =
@@ -295,7 +295,6 @@ class EditOrder extends Component {
 
     return (
       <View style={{ flex: 1, flexDirection: 'column', backgroundColor: 'lightsteelblue' }}>
-        <Spinner visible={this.state.showSpinner} textContent={"Loading..."} textStyle={{ color: '#FFF' }} />
         <ListView
           dataSource={this.state.dataSource}
           renderRow={this.renderRow}
