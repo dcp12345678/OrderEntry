@@ -25,6 +25,7 @@ import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import IoniconsIcon from 'react-native-vector-icons/Ionicons';
 import LinearGradient from 'react-native-linear-gradient';
+import Spinner from 'react-native-loading-spinner-overlay';
 
 const styles = StyleSheet.create({
   mainHeader: {
@@ -82,7 +83,8 @@ class EditOrderLineItem extends Component {
     super(props);
     this.state = {
       isLoaded: false,
-      isNew: this.props.navigation.state.params.orderLineItemId === -1
+      isNew: this.props.navigation.state.params.orderLineItemId === -1,
+      showSpinner: true,
     };
 
     const self = this;
@@ -117,14 +119,15 @@ class EditOrderLineItem extends Component {
       self.setState({
         lineItem,
         isLoaded: true,
+        showSpinner: false,
       });
     }).catch((err) => {
+      this.state = { showSpinner: false };
       Alert.alert('error initializing form', `${JSON.stringify(err) || '-- error initializing form'}`);
     });
   }
 
   componentDidMount() {
-    debugger;
     const nav = this.props.navigation;
 
     // determine the title to use in the navigation header
@@ -132,8 +135,7 @@ class EditOrderLineItem extends Component {
     if (nav.state.params.orderId === -1) {
       title = "New Order - Add Item";
     } else {
-      title = nav.state.params.orderLineItemId === -1 ? `Add Order Item - Order ${nav.state.params.orderId}` :
-        `Edit Order Item - Item ID: ${nav.state.params.orderLineItemId}`;
+      title = nav.state.params.orderLineItemId === -1 ? `Add Order Item` : `Edit Order Item`;
     }
 
     // wire up the navigation parameters
@@ -221,7 +223,7 @@ class EditOrderLineItem extends Component {
 
   render() {
     if (!this.state.isLoaded) {
-      return (<View><Text>loading...</Text></View>);
+      return <View><Spinner visible={this.state.showSpinner} textContent={"Please Wait..."} textStyle={{ color: '#FFF' }} /></View>
     }
 
     // determine if all line item values have been entered (we'll use this info to determine if save button should
