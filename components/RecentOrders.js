@@ -99,7 +99,7 @@ class RecentOrders extends Component {
             borderRadius: 20,
             marginLeft: 5,
           }}
-          underlayColor='#578dba' onPress={() => { RecentOrders.searchOrdersOnPress(); }}>
+          underlayColor='#578dba' onPress={() => { RecentOrders.searchOrdersOnPress(navigation); }}>
           <View style={{ marginRight: 8, flexDirection: 'row', justifyContent: 'center' }}>
             <MaterialIcon name='search' color='white' size={30} style={{ alignSelf: 'center', marginLeft: 5, marginTop: 5, marginBottom: 5, marginRight: 5 }} />
           </View>
@@ -118,8 +118,11 @@ class RecentOrders extends Component {
       });
   }
 
-  static searchOrdersOnPress = () => {
-    Alert.alert('inside searchOrdersOnPress');
+  static searchOrdersOnPress = (navigation) => {
+    // take user to SearchOrders screen, which will allow them to search for orders
+    navigation.navigate('SearchOrders',
+      {
+      });
   }
 
   componentDidMount() {

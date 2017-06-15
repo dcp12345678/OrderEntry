@@ -11,6 +11,7 @@ import PickerListView from './components/PickerListView';
 import EditOrder from './components/EditOrder';
 import EditOrderLineItem from './components/EditOrderLineItem';
 import RecentOrders from './components/RecentOrders';
+import SearchOrders from './components/SearchOrders';
 import Login from './components/Login';
 
 const OrderEntry = StackNavigator({
@@ -20,6 +21,7 @@ const OrderEntry = StackNavigator({
   RecentOrders: { screen: RecentOrders },
   EditOrderLineItem: { screen: EditOrderLineItem },
   EditOrder: { screen: EditOrder },
+  SearchOrders: { screen: SearchOrders },
 });
 
 AppRegistry.registerComponent('OrderEntry', () => OrderEntry);
