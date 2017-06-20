@@ -25,13 +25,14 @@ import LinearGradient from 'react-native-linear-gradient';
 import Spinner from 'react-native-loading-spinner-overlay';
 import DatePicker from 'react-native-datepicker';
 import moment from 'moment';
+import OrderListView from './OrderListView';
 
 const ordersApi = new OrdersApi();
 
 class SearchOrders extends Component {
 
   static navigationOptions = ({ navigation }) => ({
-    title: 'Search Orders',
+    title: navigation.state.params.title || 'Search Orders',
     headerStyle: { backgroundColor: 'steelblue' },
     headerTitleStyle: { color: 'darkblue', fontSize: Platform.OS === 'ios' ? 18 : 20, },
     headerLeft: (
@@ -40,7 +41,7 @@ class SearchOrders extends Component {
           style={{
             borderRadius: 20,
           }}
-          underlayColor='#578dba' onPress={() => { navigation.goBack(); }}>
+          underlayColor='#578dba' onPress={() => { navigation.state.params.backButtonOnPress(); }}>
           <FontAwesomeIcon name='arrow-circle-left' color='white' size={30} style={{ alignSelf: 'center', marginLeft: 5, marginTop: 5, marginBottom: 5, marginRight: 5 }} />
         </TouchableHighlight>
       </View>
@@ -51,9 +52,42 @@ class SearchOrders extends Component {
 
   constructor(props) {
     super(props)
-    this.state = {
-      createDateStart: moment().subtract(1, 'year').format('YYYY-MM-DD'),
-      createDateEnd: moment().format('YYYY-MM-DD')
+    this.state = this.getInitialState();
+  }
+
+  getInitialState = () => {
+    let obj = {};
+    obj.createDateStart = moment().subtract(1, 'year').format('YYYY-MM-DD');
+    obj.createDateEnd = moment().format('YYYY-MM-DD');
+    obj.orders = undefined;
+    obj.orderId = undefined;
+    return obj;
+  }
+
+  componentDidMount() {
+    // wire up the navigation parameters
+    this.props.navigation.setParams(
+      {
+        title: 'Search Orders',
+        backButtonOnPress: this.backButtonOnPress,
+      }
+    );
+
+  }
+
+  backButtonOnPress = () => {
+    if (_.isUndefined(this.state.orders)) {
+      // go back to previous screen since they haven't done a search yet
+      this.props.navigation.goBack();
+    } else {
+      // they've done a search and have search results, so just reset the orders
+      // so they can do another search (e.g. search criteria will be redisplayed)
+      this.props.navigation.setParams(
+        {
+          title: 'Search Orders'
+        }
+      );
+      this.setState(this.getInitialState());
     }
   }
 
@@ -63,18 +97,34 @@ class SearchOrders extends Component {
       createDateEnd: this.state.createDateEnd
     };
     if (!Helper.isNullOrWhitespace(this.state.orderId)) {
-      criteria.orderId = this.state.orderId;
+      criteria.id = this.state.orderId;
     }
 
-    let res = await ordersApi.searchOrders(criteria);
-    let orders = JSON.parse(res.text);
-    this.setState({ orders });
+    //Alert.alert('test',`criteria = ${JSON.stringify(criteria)}`);
+    let apiCallResult = JSON.parse((await ordersApi.searchOrders(criteria)).text);
+    if (apiCallResult.result === 'success') {
+      this.props.navigation.setParams(
+        {
+          title: 'Search Orders - Results'
+        }
+      );
+      this.setState({ orders: apiCallResult.orders });
+    } else {
+      Alert.alert('error', `Could not retrieve orders: ${apiCallResult.result}`);
+    }
   }
 
   render() {
     if (!_.isUndefined(this.state.orders)) {
       return (
-        <View><Text>Got the orders!</Text></View>
+        <View style={{ flex: 1, backgroundColor: 'lightsteelblue' }}>
+          <OrderListView
+            orders={this.state.orders}
+            userId={this.props.navigation.state.params.userId}
+            navigation={this.props.navigation}
+          >
+          </OrderListView>
+        </View>
       );
     } else {
       return (
