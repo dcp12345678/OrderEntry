@@ -39,6 +39,16 @@ class OrdersApi {
       .send({ts: moment().valueOf()})
       .send(order);
   }
+
+  searchOrders(criteria) {
+    // alert(`criteria = ${JSON.stringify(criteria, null, 2)}`);
+    const url = `${Config.restApi.baseUrl}/orderData/search`;
+    return request
+      .get(url)
+      .query({ts: moment().valueOf()})
+      .query(criteria);
+  }
+
 }
 
 export default OrdersApi;
