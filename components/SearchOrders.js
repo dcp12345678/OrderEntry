@@ -23,7 +23,8 @@ import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import LinearGradient from 'react-native-linear-gradient';
 import Spinner from 'react-native-loading-spinner-overlay';
-import DatePicker from 'react-native-datepicker'
+import DatePicker from 'react-native-datepicker';
+import moment from 'moment';
 
 class SearchOrders extends Component {
 
@@ -31,7 +32,16 @@ class SearchOrders extends Component {
     title: 'Search Orders',
     headerStyle: { backgroundColor: 'steelblue' },
     headerTitleStyle: { color: 'darkblue', fontSize: Platform.OS === 'ios' ? 18 : 20, },
-    headerLeft: (<View></View>
+    headerLeft: (
+      <View style={{ flexDirection: 'row' }}>
+        <TouchableHighlight
+          style={{
+            borderRadius: 20,
+          }}
+          underlayColor='#578dba' onPress={() => { navigation.goBack(); }}>
+          <FontAwesomeIcon name='arrow-circle-left' color='white' size={30} style={{ alignSelf: 'center', marginLeft: 5, marginTop: 5, marginBottom: 5, marginRight: 5 }} />
+        </TouchableHighlight>
+      </View>
     ),
     headerRight: (<View></View>
     ),
@@ -39,7 +49,10 @@ class SearchOrders extends Component {
 
   constructor(props) {
     super(props)
-    this.state = { date: "" }
+    this.state = {
+      createDateStart: moment().subtract(1, 'year').format('YYYY-MM-DD'),
+      createDateEnd: moment().format('YYYY-MM-DD')
+    }
   }
 
   searchOnPress = () => {
@@ -55,11 +68,11 @@ class SearchOrders extends Component {
           </View>
           <View style={{ marginTop: 10, flexDirection: 'row' }}>
             <DatePicker
-              date={this.state.date}
+              date={this.state.createDateStart}
               mode="date"
               placeholder=""
               format="YYYY-MM-DD"
-              minDate="2012-05-01"
+              minDate="2010-05-01"
               maxDate="2018-06-01"
               confirmBtnText="Confirm"
               cancelBtnText="Cancel"
@@ -75,7 +88,7 @@ class SearchOrders extends Component {
                   color: 'darkblue',
                 }
               }}
-              onDateChange={(date) => { this.setState({ date: date }) }}
+              onDateChange={(date) => { this.setState({ createDateStart: date }) }}
             />
             <Text style={{
               fontSize: 20,
@@ -86,11 +99,11 @@ class SearchOrders extends Component {
               alignSelf: 'center'
             }}>and</Text>
             <DatePicker
-              date={this.state.date}
+              date={this.state.createDateEnd}
               mode="date"
               placeholder=""
               format="YYYY-MM-DD"
-              minDate="2012-05-01"
+              minDate="2010-05-01"
               maxDate="2018-06-01"
               confirmBtnText="Confirm"
               cancelBtnText="Cancel"
@@ -106,7 +119,7 @@ class SearchOrders extends Component {
                   color: 'darkblue',
                 }
               }}
-              onDateChange={(date) => { this.setState({ date: date }) }}
+              onDateChange={(date) => { this.setState({ createDateEnd: date }) }}
             />
           </View>
 
@@ -124,7 +137,7 @@ class SearchOrders extends Component {
                 marginTop: 10,
               }}
               underlineColorAndroid='transparent'
-              placeholder="Type Order ID here" />
+              placeholder="Order ID or leave blank" />
           </View >
           <LinearGradient style={{ borderRadius: 5, alignSelf: 'stretch', marginTop: 40 }}
             colors={['#4c669f', '#3b5998', '#192f6a']} >
