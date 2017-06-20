@@ -40,6 +40,9 @@ class OrdersApi {
       .send(order);
   }
 
+  // searches for orders using given criteria
+  // search criteria should be sent in body, and formatted like this (replace order_id and YYYY-MM-DD with actual values):
+  //   { id: order_id, createDateStart: 'YYYY-MM-DD', createDateEnd: 'YYYY-MM-DD' }
   searchOrders(criteria) {
     // alert(`criteria = ${JSON.stringify(criteria, null, 2)}`);
     const url = `${Config.restApi.baseUrl}/orderData/search`;
