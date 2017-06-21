@@ -21,7 +21,6 @@ import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import LinearGradient from 'react-native-linear-gradient';
 import Spinner from 'react-native-loading-spinner-overlay';
 
-const basketIcon = require('../images/basket.png');
 const ordersApi = new OrdersApi();
 const width = Dimensions.get('window').width;
 
@@ -35,50 +34,23 @@ const styles = StyleSheet.create({
     paddingTop: 5,
     paddingBottom: 5
   },
-  icon: {
-    tintColor: '#fff',
-    height: 22,
-    width: 22
-  },
   info: {
     flex: 1,
     paddingLeft: 25,
     paddingRight: 25
   },
-  items: {
-    fontWeight: 'bold',
-    fontSize: 18,
-    marginBottom: 5,
-  },
   orderDetail: {
     color: 'darkblue',
     fontSize: 18,
-  },
-  total: {
-    width: 80,
   },
   date: {
     fontSize: 15,
     marginBottom: 5,
     color: 'darkblue'
   },
-  price: {
-    color: '#1cad61',
-    fontSize: 25,
-    fontWeight: 'bold',
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-around',
-    marginTop: 10,
-    marginBottom: 10,
-    backgroundColor: 'steelblue'
-  },
 });
 
 class OrderListView extends Component {
-
 
   constructor(props) {
     super(props);

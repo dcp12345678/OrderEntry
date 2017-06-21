@@ -99,15 +99,18 @@ class SearchOrders extends Component {
       criteria.id = this.state.orderId;
     }
 
-    //Alert.alert('test',`criteria = ${JSON.stringify(criteria)}`);
     let apiCallResult = JSON.parse((await ordersApi.searchOrders(criteria)).text);
     if (apiCallResult.result === 'success') {
-      this.props.navigation.setParams(
-        {
-          title: 'Search Orders - Results'
-        }
-      );
-      this.setState({ orders: apiCallResult.orders });
+      if (apiCallResult.orders.length === 0) {
+        Alert.alert('No Orders', 'No orders found for selected search criteria');
+      } else {
+        this.props.navigation.setParams(
+          {
+            title: 'Search Orders - Results'
+          }
+        );
+        this.setState({ orders: apiCallResult.orders });
+      }
     } else {
       Alert.alert('error', `Could not retrieve orders: ${apiCallResult.result}`);
     }

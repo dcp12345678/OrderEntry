@@ -40,8 +40,6 @@ class PickerButton extends Component {
       }
     }
 
-    //Alert.alert(`defaultItemText = ${defaultItemText}`);
-
     return (
       <View>
         <LinearGradient style={{ borderRadius: 10, alignSelf: 'stretch', marginLeft: 7, marginRight: 7, marginTop: 10 }}

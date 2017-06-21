@@ -82,6 +82,7 @@ class RecentOrders extends Component {
     // take user to SearchOrders screen, which will allow them to search for orders
     this.props.navigation.navigate('SearchOrders',
       {
+        userId: this.props.navigation.state.params.userId,
       });
   }
 
