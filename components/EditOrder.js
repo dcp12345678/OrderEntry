@@ -52,7 +52,10 @@ class EditOrder extends Component {
           style={{
             borderRadius: 20,
           }}
-          underlayColor='#578dba' onPress={() => { navigation.goBack(); }}>
+          underlayColor='#578dba'
+          onPress={() => {
+            navigation.goBack();
+          }}>
           <FontAwesomeIcon name='arrow-circle-left' color='white' size={30} style={{ alignSelf: 'center', marginLeft: 5, marginTop: 5, marginBottom: 5, marginRight: 5 }} />
         </TouchableHighlight>
       </View>

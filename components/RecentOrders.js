@@ -91,7 +91,7 @@ class RecentOrders extends Component {
           style={{
             borderRadius: 20,
           }}
-          underlayColor='#578dba' onPress={() => { RecentOrders.newOrderOnPress(navigation); }}>
+          underlayColor='#578dba' onPress={() => { navigation.state.params.newOrderOnPress(); }}>
           <MaterialIcon name='add-circle-outline' color='white' size={30} style={{ alignSelf: 'center', marginLeft: 5, marginTop: 5, marginBottom: 5, marginRight: 5 }} />
         </TouchableHighlight>
         <TouchableHighlight
@@ -99,7 +99,7 @@ class RecentOrders extends Component {
             borderRadius: 20,
             marginLeft: 5,
           }}
-          underlayColor='#578dba' onPress={() => { RecentOrders.searchOrdersOnPress(navigation); }}>
+          underlayColor='#578dba' onPress={() => { navigation.state.params.searchOrdersOnPress(); }}>
           <View style={{ marginRight: 8, flexDirection: 'row', justifyContent: 'center' }}>
             <MaterialIcon name='search' color='white' size={30} style={{ alignSelf: 'center', marginLeft: 5, marginTop: 5, marginBottom: 5, marginRight: 5 }} />
           </View>
@@ -108,24 +108,31 @@ class RecentOrders extends Component {
     ),
   });
 
-  static newOrderOnPress = (navigation) => {
+  newOrderOnPress = () => {
     // take user to EditOrderLineItem screen, which will allow them to add the first line item to the new order
-    navigation.navigate('EditOrderLineItem',
+    this.props.navigation.navigate('EditOrderLineItem',
       {
-        userId: navigation.state.params.userId,
+        userId: this.props.navigation.state.params.userId,
         orderId: -1,
         orderLineItemId: -1,
       });
   }
 
-  static searchOrdersOnPress = (navigation) => {
+  searchOrdersOnPress = () => {
     // take user to SearchOrders screen, which will allow them to search for orders
-    navigation.navigate('SearchOrders',
+    this.props.navigation.navigate('SearchOrders',
       {
       });
   }
 
   componentDidMount() {
+    // wire up the navigation parameters
+    this.props.navigation.setParams(
+      {
+        newOrderOnPress: this.newOrderOnPress,
+        searchOrdersOnPress: this.searchOrdersOnPress,
+      }
+    );
     this.getOrders();
   }
 

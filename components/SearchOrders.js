@@ -72,7 +72,6 @@ class SearchOrders extends Component {
         backButtonOnPress: this.backButtonOnPress,
       }
     );
-
   }
 
   backButtonOnPress = () => {
