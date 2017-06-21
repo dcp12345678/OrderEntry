@@ -143,7 +143,9 @@ class RecentOrders extends Component {
         <OrderListView
           orders={this.state.orders}
           userId={this.props.navigation.state.params.userId}
+          expandedOrderId={this.props.navigation.state.params.expandedOrderId}
           navigation={this.props.navigation}
+          prevScreen="RecentOrders"
         >
         </OrderListView>
       </View>

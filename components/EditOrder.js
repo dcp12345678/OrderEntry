@@ -54,7 +54,13 @@ class EditOrder extends Component {
           }}
           underlayColor='#578dba'
           onPress={() => {
-            navigation.goBack();
+            //navigation.goBack();
+            navigation.navigate(navigation.state.params.prevScreen,
+              {
+                userId: navigation.state.params.userId,
+                expandedOrderId: navigation.state.params.orderId
+              });
+
           }}>
           <FontAwesomeIcon name='arrow-circle-left' color='white' size={30} style={{ alignSelf: 'center', marginLeft: 5, marginTop: 5, marginBottom: 5, marginRight: 5 }} />
         </TouchableHighlight>
@@ -125,6 +131,7 @@ class EditOrder extends Component {
         userId: this.props.navigation.state.params.userId,
         orderId: this.props.navigation.state.params.orderId,
         orderLineItemId: -1,
+        prevScreen: this.props.navigation.state.params.prevScreen,
       });
   }
 
@@ -208,6 +215,7 @@ class EditOrder extends Component {
         userId: this.props.navigation.state.params.userId,
         orderId: this.props.navigation.state.params.orderId,
         orderLineItemId: id,
+        prevScreen: this.props.navigation.state.params.prevScreen,
       });
   }
 

@@ -187,6 +187,7 @@ class EditOrderLineItem extends Component {
         {
           userId: navigation.state.params.userId,
           orderId: order.id,
+          prevScreen: navigation.state.params.prevScreen,
         });
     } catch(err) {
       Alert.alert('error saving order', `${JSON.stringify(err) || '-- error saving order'}`);

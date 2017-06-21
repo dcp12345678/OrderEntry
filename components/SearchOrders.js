@@ -76,8 +76,12 @@ class SearchOrders extends Component {
 
   backButtonOnPress = () => {
     if (_.isUndefined(this.state.orders)) {
-      // go back to previous screen since they haven't done a search yet
-      this.props.navigation.goBack();
+      // go back to recent orders screen since they haven't done a search yet
+      this.props.navigation.navigate("RecentOrders",
+        {
+          userId: this.props.navigation.state.params.userId,
+
+        });
     } else {
       // they've done a search and have search results, so just reset the orders
       // so they can do another search (e.g. search criteria will be redisplayed)
@@ -124,6 +128,7 @@ class SearchOrders extends Component {
             orders={this.state.orders}
             userId={this.props.navigation.state.params.userId}
             navigation={this.props.navigation}
+            prevScreen="SearchOrders"
           >
           </OrderListView>
         </View>

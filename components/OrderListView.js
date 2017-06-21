@@ -59,10 +59,12 @@ class OrderListView extends Component {
 
     for (let i = 0; i < orders.length; ++i) {
       const o = orders[i];
-      o.isExpanded = false;  // indicates whether order is expanded to include its details
-      o.products = {};
+
+      // indicates whether order is expanded to include its details
+      o.isExpanded = !_.isUndefined(props.expandedOrderId) && props.expandedOrderId === orders[i].id;
 
       // compute count of each type of product
+      o.products = {};
       _.map(o.lineItems, (i) => {
         if (_.isUndefined(o.products[i.productTypeName])) {
           o.products[i.productTypeName] = 1;
@@ -111,6 +113,7 @@ class OrderListView extends Component {
       {
         orderId: orderId,
         userId: this.props.userId,
+        prevScreen: this.props.prevScreen,
       });
   }
 
