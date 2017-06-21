@@ -13,7 +13,6 @@ import {
 import OrdersApi from '../api/OrdersApi';
 import _ from 'lodash';
 import Helper from '../helpers/Helper';
-import co from 'co';
 import Promise from 'bluebird';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
@@ -53,7 +52,16 @@ class EditOrder extends Component {
           style={{
             borderRadius: 20,
           }}
-          underlayColor='#578dba' onPress={() => { navigation.goBack(); }}>
+          underlayColor='#578dba'
+          onPress={() => {
+            //navigation.goBack();
+            navigation.navigate(navigation.state.params.prevScreen,
+              {
+                userId: navigation.state.params.userId,
+                expandedOrderId: navigation.state.params.orderId
+              });
+
+          }}>
           <FontAwesomeIcon name='arrow-circle-left' color='white' size={30} style={{ alignSelf: 'center', marginLeft: 5, marginTop: 5, marginBottom: 5, marginRight: 5 }} />
         </TouchableHighlight>
       </View>
@@ -123,21 +131,21 @@ class EditOrder extends Component {
         userId: this.props.navigation.state.params.userId,
         orderId: this.props.navigation.state.params.orderId,
         orderLineItemId: -1,
+        prevScreen: this.props.navigation.state.params.prevScreen,
       });
   }
 
-  deleteLineItemsOnPress = () => {
-    const self = this;
-    co(function* () {
+  deleteLineItemsOnPress = async () => {
+    try {
       // fetch the order from persistence to make sure we have latest version
-      let res = yield ordersApi.getOrder(self.props.navigation.state.params.orderId);
+      let res = await ordersApi.getOrder(this.props.navigation.state.params.orderId);
       const order = JSON.parse(res.text);
 
       // create a newLineItems array which will contain all the line items which the user did *not* select
       // to delete (e.g. it will contain the line items we are keeping)
       let newLineItems = [];
       _.forEach(order.lineItems, (lineItem) => {
-        let foundRec = _.find(self.state.orderLineItems, (i) => {
+        let foundRec = _.find(this.state.orderLineItems, (i) => {
           // if isSelected is true, it means this is a line item which is to be deleted,
           // so we *don't* want to include it in newLineItems
           return i.id === lineItem.id && !i.isSelected;
@@ -149,9 +157,12 @@ class EditOrder extends Component {
 
       // apply line item deletions to persistence then update the state
       order.lineItems = newLineItems;
-      yield ordersApi.saveOrder(order);
-      self.updateLineItemState(self, order.lineItems);
-    });
+      await ordersApi.saveOrder(order);
+      this.updateLineItemState(this, order.lineItems);
+    } catch (err) {
+      this.setState({ showSpinner: false });
+      Alert.alert('error deleting line items!', `${JSON.stringify(err) || '-- could not delete line items'}`);
+    }
   }
 
   getOrderDetails = () => {
@@ -204,6 +215,7 @@ class EditOrder extends Component {
         userId: this.props.navigation.state.params.userId,
         orderId: this.props.navigation.state.params.orderId,
         orderLineItemId: id,
+        prevScreen: this.props.navigation.state.params.prevScreen,
       });
   }
 
@@ -255,34 +267,6 @@ class EditOrder extends Component {
 
   goBackOnPress = () => {
     this.props.navigator.pop();
-  }
-
-  deleteOnPress = () => {
-    const self = this;
-    co(function* () {
-      // fetch the order from persistence to make sure we have latest version
-      let res = yield ordersApi.getOrder(self.props.orderId);
-      const order = JSON.parse(res.text);
-
-      // create a newLineItems array which will contain all the line items which the user did *not* select
-      // to delete (e.g. it will contain the line items we are keeping)
-      let newLineItems = [];
-      _.forEach(order.lineItems, (lineItem) => {
-        let foundRec = _.find(self.state.orderLineItems, (i) => {
-          // if isSelected is true, it means this is a line item which is to be deleted,
-          // so we *don't* want to include it in newLineItems
-          return i.id === lineItem.id && !i.isSelected;
-        });
-        if (!_.isUndefined(foundRec)) {
-          newLineItems.push(lineItem);
-        }
-      });
-
-      // apply line item deletions to persistence
-      order.lineItems = newLineItems;
-      yield ordersApi.saveOrder(order);
-      self.updateLineItemState(self, order.lineItems);
-    });
   }
 
   render() {
