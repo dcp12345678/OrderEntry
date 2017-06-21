@@ -20,61 +20,13 @@ import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import LinearGradient from 'react-native-linear-gradient';
 import Spinner from 'react-native-loading-spinner-overlay';
+import OrderListView from './OrderListView';
 
 const basketIcon = require('../images/basket.png');
 const ordersApi = new OrdersApi();
 const width = Dimensions.get('window').width;
 
 const styles = StyleSheet.create({
-  row: {
-    borderColor: '#f1f1f1',
-    borderBottomWidth: 1,
-    flexDirection: 'row',
-    marginLeft: 10,
-    marginRight: 10,
-    paddingTop: 5,
-    paddingBottom: 5
-  },
-  icon: {
-    tintColor: '#fff',
-    height: 22,
-    width: 22
-  },
-  info: {
-    flex: 1,
-    paddingLeft: 25,
-    paddingRight: 25
-  },
-  items: {
-    fontWeight: 'bold',
-    fontSize: 18,
-    marginBottom: 5,
-  },
-  orderDetail: {
-    color: 'darkblue',
-    fontSize: 18,
-  },
-  total: {
-    width: 80,
-  },
-  date: {
-    fontSize: 15,
-    marginBottom: 5,
-    color: 'darkblue'
-  },
-  price: {
-    color: '#1cad61',
-    fontSize: 25,
-    fontWeight: 'bold',
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-around',
-    marginTop: 10,
-    marginBottom: 10,
-    backgroundColor: 'steelblue'
-  },
 });
 
 class RecentOrders extends Component {
@@ -107,6 +59,14 @@ class RecentOrders extends Component {
       </View>
     ),
   });
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      dataSource: undefined,
+      showSpinner: false,
+    };
+  }
 
   newOrderOnPress = () => {
     // take user to EditOrderLineItem screen, which will allow them to add the first line item to the new order
@@ -173,126 +133,18 @@ class RecentOrders extends Component {
     }
   }
 
-  orderOnPress = (orderId) => {
-    // update the data source, flipping the expanded state for the order matching passed in orderId
-
-    let newOrders = _.cloneDeep(this.state.orders);
-
-    _.forEach(newOrders, (order) => {
-      if (order.id === orderId) {
-        order.isExpanded = !order.isExpanded;
-      }
-    });
-
-    let ds = new ListView.DataSource({
-      rowHasChanged: (r1, r2) => r1 !== r2
-    });
-
-    this.setState({
-      dataSource: ds.cloneWithRows(newOrders),
-      orders: newOrders
-    });
-  }
-
-  editOrderOnPress = (orderId) => {
-    this.props.navigation.navigate('EditOrder',
-      {
-        orderId: orderId,
-        userId: this.props.navigation.state.params.userId,
-      });
-  }
-
-  constructor(props) {
-    super(props);
-    this.state = {
-      dataSource: undefined,
-      showSpinner: false,
-    };
-  }
-
-  renderRow = (record) => {
-    let expandedContent;
-
-    // if isExpanded is true, we need to show additional information for this order
-    if (record.isExpanded) {
-      let products = [];
-      for (let key in record.products) {
-        products.push(
-          <View key={key} style={{ flex: 1, flexDirection: 'row' }}>
-            <View key={key} style={
-              {
-                flex: 1,
-                flexDirection: 'row',
-                borderWidth: 1,
-                borderColor: 'white',
-                backgroundColor: 'steelblue',
-                margin: 1,
-              }
-            }>
-              <Text key={key + '_text'} style={{ flex: .8, fontSize: 15, color: 'white', borderWidth: 1, borderColor: 'white', padding: 2 }}>{key}:</Text>
-              <Text key={key + '_cnt'} style={{ flex: .2, fontSize: 15, color: 'white', borderWidth: 1, borderColor: 'white', padding: 2 }}>{record.products[key]}</Text>
-            </View>
-          </View>
-        );
-      };
-
-      let content = [];
-      content.push(
-        <View key="view_expandedHeader" style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-          <Text key="expandedHeader" style={[styles.orderDetail, { fontWeight: '600' }]}>Items:</Text>
-
-          <View key="expandedDetail" style={{ flex: 1, marginLeft: 10, marginRight: 10, marginBottom: 5 }}>{products}</View>
-
-          <View>
-            <TouchableHighlight
-              style={{
-                borderRadius: 20,
-              }}
-              underlayColor='#578dba' onPress={() => { this.editOrderOnPress(record.id); }}>
-              <FontAwesomeIcon name='edit' color='white' size={30}
-                style={
-                  {
-                    alignSelf: 'center',
-                    marginLeft: 12,
-                  }
-                } />
-            </TouchableHighlight>
-          </View>
-
-        </View >
-      );
-      expandedContent = (<View>{content}</View>);
-    }
-
-    return (
-      <TouchableHighlight underlayColor='#578dba' onPress={() => { this.orderOnPress(record.id); }}>
-        <View>
-          <View style={styles.row}>
-            <View style={[styles.info, { backgroundColor: '#5282aa', borderRadius: 9, }]}>
-              <View style={{ flexDirection: 'row' }}>
-                <Text style={[styles.orderDetail, { fontWeight: 'bold', fontSize: 20 }]}>Order: {record.id}</Text>
-                <Text style={{ marginLeft: 5, color: 'white', alignSelf: 'center' }}>({record.lineItems.length} items)</Text>
-              </View>
-              <Text style={styles.date}>Last Update: {Helper.formatDate(record.updateDate)}</Text>
-              {expandedContent}
-            </View>
-          </View>
-        </View>
-      </TouchableHighlight >
-    );
-  }
-
   render() {
     if (_.isUndefined(this.state.dataSource)) {
       return <View><Spinner visible={this.state.showSpinner} textContent={"Loading Orders..."} textStyle={{ color: '#FFF' }} /></View>
     }
     return (
       <View style={{ flex: 1, flexDirection: 'column', backgroundColor: 'lightsteelblue' }}>
-        <ListView
-          dataSource={this.state.dataSource}
-          renderRow={this.renderRow}
-          style={{ marginTop: 10, }}
-        />
+        <OrderListView
+          orders={this.state.orders}
+          userId={this.props.navigation.state.params.userId}
+          navigation={this.props.navigation}
+        >
+        </OrderListView>
       </View>
     );
   }

@@ -37,22 +37,6 @@ const styles = StyleSheet.create({
     color: 'darkblue',
     paddingLeft: 7,
   },
-  headline: {
-    fontFamily: 'Georgia',
-    fontSize: 18
-  },
-  subheader: {
-    color: 'blue'
-  },
-  bold: {
-    fontWeight: 'bold'
-  },
-  green: {
-    color: 'green'
-  },
-  purple: {
-    color: '#841584'
-  },
 });
 
 
